@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+
+PLUGIN_D="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
+# Lines of "preview"
+export LINES=1000
+# -----------------------------------------------------------------------------
+source "$PLUGIN_D/include/git/functions.sh"
+# -----------------------------------------------------------------------------
+if [[ "${BASH_SOURCE[0]}" = "${0}" ]]; then
+  subcommand="$1"
+  shift
+
+  case $subcommand in
+    *)
+      "${subcommand}" "$@"
+      if [[ $? -eq 127 ]]; then
+        cat <<EOT >&2
+Error: '$subcommand' is not a known subcommand.
+EOT
+        exit $?
+      fi
+      ;;
+  esac
+fi
+# vim: set ft=bash:
