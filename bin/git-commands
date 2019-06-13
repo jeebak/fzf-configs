@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+#
+# This script started out as a fork of:
+#   https://github.com/hankchanocd/git-commands
+#
+# Based on `git help -a` provided by `hub`, show all the available git
+# commands, both native and custom.
+#
+# git help -a
+#   Ref: https://stackoverflow.com/questions/7866353/git-list-all-available-commands
+
+# -- Ensure Correct git help options ------------------------------------------
+help_options='-a'
+# https://github.com/git/git/blob/b697d92f/Documentation/RelNotes/2.20.0.txt#L17-L18
+git help --no-verbose > /dev/null 2>&1 && help_options='--no-verbose -a'
+# Retrieve the git help, only once
+# shellcheck disable=SC2086
+git_help_all=$(git help $help_options)
+
+# -- Preparation --------------------------------------------------------------
+# The line that divides the whole text into two: regular and custom commands
+dividing_line_number=$(
+  grep -n "git commands available from elsewhere on your \$PATH" \
+    <<< "$git_help_all" | sed 's/[^0-9]*//g'
+)
+
+whole_line_number=$(
+  wc -l <<< "$git_help_all"
+)
+
+# shellcheck disable=SC2034
+black="$(tput setaf 0)"
+red="$(tput setaf 1)"
+# shellcheck disable=SC2034
+green="$(tput setaf 2)"
+# shellcheck disable=SC2034
+yellow="$(tput setaf 3)"
+blue="$(tput setaf 4)"
+# shellcheck disable=SC2034
+magenta="$(tput setaf 5)"
+# shellcheck disable=SC2034
+cyan="$(tput setaf 6)"
+white="$(tput setaf 7)"
+
+reset="$(tput sgr0)"
+
+# -- Child Functions ----------------------------------------------------------
+function native_commands() {
+  while read -r line; do
+    echo -e "${white}${line}${reset}"
+  done < <(
+    head -n "$dividing_line_number" \
+      <<< "$git_help_all" | grep "^  [a-z]" | tr ' ' '\n' | grep -v "^$"
+  )
+}
+
+function custom_commands() {
+  while read -r line; do
+    echo -e "${blue}${line}${reset}"
+  done < <(
+    tail -n $((whole_line_number - dividing_line_number)) \
+      <<< "$git_help_all" | grep "^  [a-z]" | tr ' ' '\n' | grep -v "^$"
+  )
+}
+
+function all_commands() {
+  native_commands && custom_commands
+}
+
+# -- Main ---------------------------------------------------------------------
+function main() {
+  # If fzf exists
+  if command -v fzf > /dev/null 2>&1; then
+    while result=$(
+      fzf --ansi --reverse --height=90% --cycle \
+        --bind "alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up" \
+        --preview-window=right:75% \
+        --preview="COLUMNS=$(( $(tput cols) * 3/4 )) git help git-{} || {
+          echo '\n' && (cd /tmp && git-{} -h 2> /dev/null)
+        }" <<< "$("${1:-all_commands}" | sort -u -k 1.6)"
+        # Ref: https://unix.stackexchange.com/questions/157923/sorting-strings-with-ansi-escape-codes
+    ); do
+      [[ -n "$result" ]] && git help "$result"
+    done
+  else
+    cat <<EOT
+
+${red}"fzf" is not detected in your \$PATH. Falling back to: "git help $help_options"${reset}
+
+$git_help_all
+
+EOT
+  fi
+}
+
+# -- Help ---------------------------------------------------------------------
+usage() {
+  cat <<EOT >&2
+
+  usage: ${0##*/} [<options>]
+
+  List all available git commands with help using fzf.
+  Native git commands in white, ${blue}custom git commands in blue${reset}.
+
+  where:
+    -h  show this help text
+    -n  list only the native git commands
+    -c  list only the custom git commands
+    -a  list all commands (default)
+
+  Preview window keybindings:
+    alt-j:preview-down
+    alt-k:preview-up
+    ctrl-f:preview-page-down
+    ctrl-b:preview-page-up
+
+EOT
+}
+
+# -- Parse options ------------------------------------------------------------
+while getopts ':hnca:' option; do
+  case "$option" in
+    h) usage;;
+    n) main native_commands;;
+    c) main custom_commands;;
+    a) main;;
+    :) main;;
+  \?) printf "Illegal option: -%s\n" "$OPTARG" >&2
+      usage && exit 1;;
+  esac
+done
+[[ $OPTIND -eq 1 ]] && main
