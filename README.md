@@ -15,4 +15,6 @@ CTRL-G CTRL-B for branches
 CTRL-G CTRL-T for tags
 CTRL-G CTRL-R for remotes
 CTRL-G CTRL-H for commit hashes
+
+CTRL-G h      for commit hashes
 ```
