@@ -17,4 +17,5 @@ CTRL-G CTRL-R for remotes
 CTRL-G CTRL-H for commit hashes
 
 CTRL-G h      for commit hashes
+CTRL-G CTRL-S for stashes
 ```
