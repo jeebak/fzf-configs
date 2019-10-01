@@ -30,4 +30,18 @@ fzf-gh2-widget() {
 zle -N fzf-gh2-widget
 bindkey '^gh' fzf-gh2-widget
 
-unset -f bind-git-helper
+bind-git-helper-no-join() {
+  local c
+  for c in $@; do
+    eval "fzf-g$c-widget() {
+      fzf-git g$c
+      zle accept-line
+    }
+    zle -N fzf-g$c-widget
+    bindkey '^g^$c' fzf-g$c-widget"
+  done
+}
+
+bind-git-helper-no-join s
+
+unset -f bind-git-helper bind-git-helper-no-join
