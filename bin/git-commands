@@ -73,6 +73,7 @@ function main() {
   if command -v fzf > /dev/null 2>&1; then
     while result=$(
       fzf --ansi --reverse --height=90% --cycle \
+        --header="Preview: alt-j:↓,alt-k:↑,^f:pg↓,^b:pg↑" \
         --bind "alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up" \
         --preview-window=right:75% \
         --preview="COLUMNS=$(( $(tput cols) * 3/4 )) git help git-{} || {
