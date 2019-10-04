@@ -9,6 +9,19 @@ fzf-down() {
   fzf --height 50% "$@" --border
 }
 
+fzf-git-help() {
+  local cmd
+  # mdp displays blank page :/
+  # mdv throws unichr error
+# [[ -z "$cmd" ]] && cmd="$(command -v mdp)"
+# [[ -z "$cmd" ]] && cmd="$(command -v mdv)"
+  [[ -z "$cmd" ]] && cmd="$(command -v mdless)"
+  [[ -z "$cmd" ]] && cmd="$(command -v bat)"
+  [[ -z "$cmd" ]] && cmd="$(command -v less)"
+  [[ -z "$cmd" ]] && cmd="$(command -v cat)"
+  "$cmd" "$PLUGIN_D/README.md" < /dev/tty > /dev/tty
+}
+
 gf() {
   is_in_git_repo || return
   git -c color.status=always status --short |

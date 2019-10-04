@@ -45,3 +45,5 @@ bind-git-helper-no-join() {
 bind-git-helper-no-join s
 
 unset -f bind-git-helper bind-git-helper-no-join
+
+bindkey -s '^g^_' "fzf-git\n"
