@@ -18,4 +18,6 @@ CTRL-G CTRL-H for commit hashes
 
 CTRL-G h      for commit hashes
 CTRL-G CTRL-S for stashes
+
+CTRL-G CTRL-/ for fzf-git help
 ```

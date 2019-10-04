@@ -7,3 +7,4 @@ bind '"\C-gh":    "$(fzf-git gh)\e\C-e\er"'
 bind '"\C-g\C-r": "$(fzf-git gr)\e\C-e\er"'
 
 bind '"\C-g\C-s": "$(fzf-git gs)\e\C-e\er"'
+bind '"\C-g\C-_": "fzf-git\n"'

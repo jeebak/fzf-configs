@@ -11,6 +11,9 @@ if [[ "${BASH_SOURCE[0]}" = "${0}" ]]; then
   shift
 
   case $subcommand in
+    "" | "-h" | "--help")
+      fzf-git-help
+      ;;
     *)
       "${subcommand}" "$@"
       if [[ $? -eq 127 ]]; then
