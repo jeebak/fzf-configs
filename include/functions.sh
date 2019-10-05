@@ -1,8 +1,6 @@
 # GIT heart FZF
 # -------------
 
-FZF_PREVIEW_BIND="alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up"
-
 is_in_git_repo() {
   git rev-parse HEAD > /dev/null 2>&1
 }
