@@ -20,11 +20,56 @@ fzf-git-help() {
 }
 
 gf() {
+  # TODO: Explore possibilty of using a tmux pane (test if $TMUX is set,) to
+  # start an $EDITOR session to edit files, or for "git commit"
   is_in_git_repo || return
-  git -c color.status=always status --short |
-  fzf-down -m --ansi --nth 2..,.. \
-    --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -500' |
-  cut -c4- | sed 's/.* -> //'
+  local header bind expect out yn
+
+  header="Pick multi-files w/ tab/shift-tab,^a:add,^d:diff,^p:add -p,^r:revert,^x:rm"
+  bind="alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up"
+  expect="ctrl-a,ctrl-d,ctrl-p,ctrl-r,ctrl-x"
+
+  while out=(
+    $(git -c color.status=always status --short |
+      fzf -m --ansi --nth 2..,.. \
+        --header="$header" --bind="$bind" --expect="$expect" \
+        --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) |
+      head -500' | sed 's/^\(ctrl-.\)/    \1/' | cut -c4- | sed 's/.* -> //'
+    )
+  ); do
+    case ${out[0]} in
+      ctrl-a)
+        git add "${out[@]:1}"
+        ;;
+      ctrl-d)
+        git diff --color=always -- "${out[@]:1}" | less -r > /dev/tty
+        ;;
+      ctrl-p)
+        git add -p "${out[@]:1}"
+        ;;
+      ctrl-r)
+        read -n1 -p "Really revert: ${out[*]:1}? " yn < /dev/tty
+        if [[ $yn == y ]]; then
+          git checkout -- "${out[@]:1}"
+          git status | less -r > /dev/tty
+        fi
+        ;;
+      ctrl-x)
+        read -n1 -p "Really rm: ${out[*]:1}? " yn < /dev/tty
+        if [[ $yn == y ]]; then
+          git checkout -- "${out[@]:1}"
+          git rm -f "${out[@]:1}"
+          git status | less -r > /dev/tty
+        fi
+        ;;
+      *)
+        if [[ ${#out[@]} -gt 0 ]]; then
+          printf '%s\n' "${out[@]}"
+        fi
+        break
+        ;;
+    esac
+  done
 }
 
 gb() {
