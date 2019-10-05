@@ -23,14 +23,12 @@ fzf-git-help() {
 }
 
 gf() {
-  # TODO: Explore possibilty of using a tmux pane (test if $TMUX is set,) to
-  # start an $EDITOR session to edit files, or for "git commit"
   is_in_git_repo || return
   local header bind expect out pane_id yn
 
-  header="Pick multi-files w/ tab/shift-tab,^a:add,^d:diff,^p:add -p,^r:revert,^x:rm"
+  header="Ops:^a:add,^d:diff,^p:add -p,^r:revert,^x:rm,^y:amend-no-edit"
   bind="alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up"
-  expect="ctrl-a,ctrl-d,ctrl-p,ctrl-r,ctrl-x"
+  expect="ctrl-a,ctrl-d,ctrl-p,ctrl-r,ctrl-x,ctrl-y"
 
   if [[ -n "$TMUX" ]]; then
     header="$header,^e:edit,^o:commit"
@@ -68,6 +66,13 @@ gf() {
           git checkout -- "${out[@]:1}"
           git rm -f "${out[@]:1}"
           git status | less -r > /dev/tty
+        fi
+        ;;
+      ctrl-y)
+        read -n1 -p "Really amend --no-edit: ${out[*]:1}? " yn < /dev/tty
+        if [[ $yn == y ]]; then
+          git add "${out[@]:1}"
+          git commit --amend --no-edit > /dev/null
         fi
         ;;
       ctrl-e)
