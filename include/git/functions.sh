@@ -163,3 +163,8 @@ gs() {
     echo -n "$(tput bold)$(tput setaf 7)No stashes found!$(tput sgr0)"
   fi
 }
+
+edit-modified() {
+  is_in_git_repo || { echo "Not in a git repo." && exit 1; }
+  "${EDITOR:-vim}" $(command git status -s | sed -ne 's/^ *MM* //p')
+}

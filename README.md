@@ -20,4 +20,7 @@ CTRL-G h      for commit hashes
 CTRL-G CTRL-S for stashes
 
 CTRL-G CTRL-/ for fzf-git help
+CTRL-G CTRL-D for git diff
+CTRL-G CTRL-E for edit modified files
+CTRL-G CTRL-G for git status
 ```

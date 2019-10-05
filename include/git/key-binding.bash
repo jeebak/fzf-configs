@@ -8,3 +8,6 @@ bind '"\C-g\C-r": "$(fzf-git gr)\e\C-e\er"'
 
 bind '"\C-g\C-s": "$(fzf-git gs)\e\C-e\er"'
 bind '"\C-g\C-_": "fzf-git\n"'
+bind '"\C-g\C-d": "git diff\n"'
+bind '"\C-g\C-e": "fzf-git edit-modified\n"'
+bind '"\C-g\C-g": "git status\n"'
