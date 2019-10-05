@@ -9,6 +9,21 @@ fzf-down() {
   fzf --height 50% "$@" --border
 }
 
+fzf-git-confirm() {
+  local yn
+
+  if command -v whiptail > /dev/null; then
+    whiptail --yesno --defaultno "$1" 0 0 > /dev/tty
+  elif command -v dialog > /dev/null; then
+    dialog --defaultno --yesno "$1" 0 0 > /dev/tty
+  else
+    read -n1 -p "$1 " yn < /dev/tty
+    [[ $yn =~ [yY] ]]
+  fi
+
+  return $?
+}
+
 fzf-git-help() {
   local cmd
   # mdp displays blank page :/
@@ -24,7 +39,7 @@ fzf-git-help() {
 
 gf() {
   is_in_git_repo || return
-  local header bind expect out pane_id yn
+  local header bind expect out pane_id
 
   header="Ops:^a:add,^d:diff,^p:add -p,^r:revert,^x:rm,^y:amend-no-edit"
   bind="alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up"
@@ -54,23 +69,20 @@ gf() {
         git add -p "${out[@]:1}"
         ;;
       ctrl-r)
-        read -n1 -p "Really revert: ${out[*]:1}? " yn < /dev/tty
-        if [[ $yn == y ]]; then
+        if fzf-git-confirm "Really revert: ${out[*]:1}?"; then
           git checkout -- "${out[@]:1}"
           git status | less -r > /dev/tty
         fi
         ;;
       ctrl-x)
-        read -n1 -p "Really rm: ${out[*]:1}? " yn < /dev/tty
-        if [[ $yn == y ]]; then
+        if fzf-git-confirm "Really rm: ${out[*]:1}?"; then
           git checkout -- "${out[@]:1}"
           git rm -f "${out[@]:1}"
           git status | less -r > /dev/tty
         fi
         ;;
       ctrl-y)
-        read -n1 -p "Really amend --no-edit: ${out[*]:1}? " yn < /dev/tty
-        if [[ $yn == y ]]; then
+        if fzf-git-confirm "Really amend --no-edit: ${out[*]:1}?"; then
           git add "${out[@]:1}"
           git commit --amend --no-edit > /dev/null
         fi
