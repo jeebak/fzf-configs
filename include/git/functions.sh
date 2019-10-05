@@ -26,11 +26,16 @@ gf() {
   # TODO: Explore possibilty of using a tmux pane (test if $TMUX is set,) to
   # start an $EDITOR session to edit files, or for "git commit"
   is_in_git_repo || return
-  local header bind expect out yn
+  local header bind expect out pane_id yn
 
   header="Pick multi-files w/ tab/shift-tab,^a:add,^d:diff,^p:add -p,^r:revert,^x:rm"
   bind="alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up"
   expect="ctrl-a,ctrl-d,ctrl-p,ctrl-r,ctrl-x"
+
+  if [[ -n "$TMUX" ]]; then
+    header="$header,^e:edit,^o:commit"
+    expect="$expect,ctrl-e,ctrl-o"
+  fi
 
   while out=(
     $(git -c color.status=always status --short |
@@ -64,6 +69,14 @@ gf() {
           git rm -f "${out[@]:1}"
           git status | less -r > /dev/tty
         fi
+        ;;
+      ctrl-e)
+        pane_id=$(tmux split-window -v -P -F "#{pane_id}")
+        tmux send-keys -t "$pane_id" "${EDITOR:-vim} ${out[*]:1}; tmux wait-for -S edit-done; exit" C-m\; wait-for edit-done
+        ;;
+      ctrl-o)
+        pane_id=$(tmux split-window -v -P -F "#{pane_id}")
+        tmux send-keys -t "$pane_id" "git commit ${out[*]:1}; tmux wait-for -S commit-done; exit" C-m\; wait-for commit-done
         ;;
       *)
         if [[ ${#out[@]} -gt 0 ]]; then
