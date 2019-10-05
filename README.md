@@ -10,6 +10,9 @@
 - https://github.com/wfxr/forgit
 
 ```
+FZF_PREVIEW_BIND="alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up"
+# Use: --bind="$FZF_PREVIEW_BIND" everywhere there's --preview
+
 CTRL-G CTRL-F for files
 CTRL-G CTRL-B for branches
 CTRL-G CTRL-T for tags
