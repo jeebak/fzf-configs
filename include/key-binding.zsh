@@ -47,3 +47,6 @@ bind-git-helper-no-join s
 unset -f bind-git-helper bind-git-helper-no-join
 
 bindkey -s '^g^_' "fzf-git\n"
+bindkey -s '^g^d' "git diff\n"
+bindkey -s '^g^e' "${EDITOR:-vim} $(echo $(command git status -s | sed -ne 's/^ *MM* //p'))\n"
+bindkey -s '^g^g' "git status\n"
