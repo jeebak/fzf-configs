@@ -30,15 +30,20 @@ bindkey '\es' fzf-src
 
 # Inspired by fzf docs
 fzf-edit-file() {
-  local out
+  local item out
 
-  echo "Gathering list..."
-  out="$(
-    (git ls-tree -r --name-only HEAD || find . -type f) 2> /dev/null |
-    fzf --tiebreak=index
-  )"
+  out=$(
+    ( git ls-tree -r --name-only HEAD ||
+      find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
+        sed s/^..//) 2> /dev/null |
+    fzf --tiebreak=index --multi \
+        --header "Gathering list... (Use TAB and Shift-TAB to mark multiple items)" |
+      while read item; do
+        echo -n "${(q)item} "
+      done
+  )
 
-  [[ -n "$out" ]] && LBUFFER="${EDITOR:-vim} \"$out\""
+  [[ -n "$out" ]] && LBUFFER="${EDITOR:-vim} $out"
   zle redisplay
 }
 
