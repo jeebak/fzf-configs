@@ -9,6 +9,9 @@
 - https://github.com/junegunn/fzf/wiki/Examples
 - https://github.com/wfxr/forgit
 
+Automatically [installs fzf](https://github.com/junegunn/fzf#installation) if
+`brew` (or `git`) is available.
+
 ```
 FZF_PREVIEW_BIND="alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up"
 # Use: --bind="$FZF_PREVIEW_BIND" everywhere there's --preview
