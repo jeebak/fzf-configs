@@ -2,6 +2,22 @@
 
 # fzf-configs
 
+## Installation
+
+Add to your `.zshrc`.
+
+### Using [zplug](https://github.com/zplug/zplug)
+```shell
+zplug jeebak/fzf-configs
+```
+
+### Using [zgen](https://github.com/tarjoilija/zgen)
+```shell
+zgen jeebak/fzf-configs
+zgen save
+```
+etc. etc.
+
 ## fzf-git
 - https://junegunn.kr/2016/07/fzf-git/
   - https://gist.github.com/junegunn/8b572b8d4b5eddd8b85e5f4d40f17236
