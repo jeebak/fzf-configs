@@ -18,6 +18,9 @@ zgen save
 ```
 etc. etc.
 
+Automatically [installs fzf](https://github.com/junegunn/fzf#installation) if
+`brew` (or `git`) is available.
+
 ## fzf-git
 - https://junegunn.kr/2016/07/fzf-git/
   - https://gist.github.com/junegunn/8b572b8d4b5eddd8b85e5f4d40f17236
@@ -25,21 +28,35 @@ etc. etc.
 - https://github.com/junegunn/fzf/wiki/Examples
 - https://github.com/wfxr/forgit
 
-Automatically [installs fzf](https://github.com/junegunn/fzf#installation) if
-`brew` (or `git`) is available.
-
 ```
 FZF_PREVIEW_BIND="alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up"
 # Use: --bind="$FZF_PREVIEW_BIND" everywhere there's --preview
 
+# fzf's -m, --multi option ("Enable multi-select with tab/shift-tab") is used
+# whenever appropriate
+
 CTRL-G CTRL-F for files
+  CTRL-A: git add ...
+  CTRL-D: git diff ...
+  CTRL-P: git add -p ...
+  CTRL-R: git checkout -- ...
+  CTRL-X: git rm -f ...
+  CTRL-Y: git add ...; git  commit --amend --no-edit ...
+  # NOTE: if $TMUX is set, split-window and...
+  CTRL-E: "${EDITOR:-vim}" ...
+  CTRL-O: git add ...; git  commit --amend ...
+
 CTRL-G CTRL-B for branches
 CTRL-G CTRL-T for tags
 CTRL-G CTRL-R for remotes
-CTRL-G CTRL-H for commit hashes
 
-CTRL-G h      for commit hashes
-CTRL-G CTRL-S for stashes
+CTRL-G CTRL-H for commit hashes
+CTRL-G h        ""
+
+CTRL-G CTRL-S for stashes # NOTE: this will "en-stash" upon invocation
+  CTRL-O: git stash pop
+  CTRL-Y: git stash apply
+  CTRL-X: git stash drop
 
 CTRL-G CTRL-/ for fzf-git help
 CTRL-G CTRL-D for git diff
