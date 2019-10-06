@@ -91,8 +91,11 @@ gf() {
         tmux send-keys -t "$pane_id" "${EDITOR:-vim} ${out[*]:1}; tmux wait-for -S edit-done; exit" C-m\; wait-for edit-done
         ;;
       ctrl-o)
-        pane_id=$(tmux split-window -v -P -F "#{pane_id}")
-        tmux send-keys -t "$pane_id" "git commit ${out[*]:1}; tmux wait-for -S commit-done; exit" C-m\; wait-for commit-done
+        if fzf-git-confirm "Really add and commit: ${out[*]:1}?"; then
+          git add "${out[@]:1}"
+          pane_id=$(tmux split-window -v -P -F "#{pane_id}")
+          tmux send-keys -t "$pane_id" "git commit ${out[*]:1}; tmux wait-for -S commit-done; exit" C-m\; wait-for commit-done
+        fi
         ;;
       *)
         if [[ ${#out[@]} -gt 0 ]]; then
