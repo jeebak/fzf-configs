@@ -83,7 +83,7 @@ CTRL-G L        ""
   CTRL-W: git show -w --word-diff ...
   Enter:  git show ...
 
-CTRL-G CTRL-S for stashes # NOTE: this will "en-stash" upon invocation
+CTRL-G CTRL-S for stashes # NOTE: this will offer to "en-stash" when invoked
   CTRL-B: git stash branch <branchname>
   CTRL-O: git stash pop
   CTRL-Y: git stash apply

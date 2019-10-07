@@ -25,7 +25,8 @@ fzf-git-confirm() {
 }
 
 fzf-git-inputbox() {
-  echo "$(fzf --prompt "$1" --print-query <<< '')"
+  # Prompt text as $1, w/ optional additional options
+  echo "$(fzf --prompt "$@" --print-query <<< '')"
 }
 
 fzf-git-help() {
@@ -173,9 +174,14 @@ gs() {
   # Based on:
   #   https://gist.githubusercontent.com/junegunn/a563d9e3e07fd721d618562762ec619d/raw/5f318ec2a620243800f45caf25aa61d43f46a547/gstash.sh
   is_in_git_repo || return
-  local out k reflog operation
+  local yn out k reflog operation
   # Stash, if dirty
-  git diff --quiet || git stash
+  if git diff --quiet || yn=$(fzf-git-inputbox "Should I stash this? [y|n] " \
+      --bind="$FZF_PREVIEW_BIND" \
+      --preview 'git diff --color=always' \
+      --preview-window down:70%); then
+    [[ $yn =~ [yY] ]] && git stash
+  fi
   if [[ -s "$(git rev-parse --git-dir)/refs/stash" ]]; then
     out=(
       $(git stash list --pretty='%C(yellow)%gd %>(14)%Cgreen%cr %C(blue)%gs' |
@@ -213,3 +219,5 @@ edit-modified() {
   is_in_git_repo || { echo "Not in a git repo." && exit 1; }
   "${EDITOR:-vim}" $(command git status -s | sed -ne 's/^ *MM* //p')
 }
+
+# vim: set ft=bash:
