@@ -17,7 +17,7 @@ fzf-git-confirm() {
   elif command -v dialog > /dev/null; then
     dialog --defaultno --yesno "$1" 0 0 > /dev/tty
   else
-    read -n1 -p "$1 " yn < /dev/tty
+    yn="$(fzf-git-inputbox "$1 [y|n] ")"
     [[ $yn =~ [yY] ]]
   fi
 
@@ -25,7 +25,7 @@ fzf-git-confirm() {
 }
 
 fzf-git-inputbox() {
-  echo "$(echo | fzf --prompt "$1" --print-query)"
+  echo "$(fzf --prompt "$1" --print-query <<< '')"
 }
 
 fzf-git-help() {
