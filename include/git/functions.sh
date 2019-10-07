@@ -154,19 +154,26 @@ gl() {
   git log --graph --color=always \
           --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
   fzf --ansi --no-sort --reverse --tiebreak=index --toggle-sort=\` \
+      --bind="$FZF_PREVIEW_BIND" \
+      --preview 'git show -p --color=always {2}' \
+      --preview-window down:70% \
       --prompt="^d:diff, ^l:log -p, ^n: show --name-status,<enter>: show: " \
       --bind "ctrl-d:execute:
                 echo '{}' | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % sh -c 'git diff --color=always % | less -Rc > /dev/tty'" \
+                xargs -I % sh -c 'git diff --color=always % |
+                less -Rc > /dev/tty'" \
       --bind "ctrl-l:execute:
                 echo '{}' | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % sh -c 'git log -p --color=always %.. | less -Rc > /dev/tty'" \
+                xargs -I % sh -c 'git log -p --color=always %.. |
+                less -Rc > /dev/tty'" \
       --bind "ctrl-n:execute:
                 echo '{}' | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % sh -c 'git show --name-status --color=always %.. | less -Rc > /dev/tty'" \
+                xargs -I % sh -c 'git show --name-status --color=always %.. |
+                less -Rc > /dev/tty'" \
       --bind "ctrl-m:execute:
                 echo '{}' | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % sh -c 'git show --color=always % | less -Rc > /dev/tty'"
+                xargs -I % sh -c 'git show --color=always % |
+                less -Rc > /dev/tty'"
 }
 
 gs() {
