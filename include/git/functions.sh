@@ -24,6 +24,10 @@ fzf-git-confirm() {
   return $?
 }
 
+fzf-git-inputbox() {
+  echo "$(echo | fzf --prompt "$1" --print-query)"
+}
+
 fzf-git-help() {
   local cmd
   # mdp displays blank page :/
@@ -177,19 +181,23 @@ gs() {
       $(git stash list --pretty='%C(yellow)%gd %>(14)%Cgreen%cr %C(blue)%gs' |
         fzf --ansi --no-sort \
             --border \
-            --header='enter:show, ctrl-d:diff, ctrl-o:pop, ctrl-y:apply, ctrl-x:drop' \
+            --header='enter:show,^b:branch,^d:diff,^o:pop,^y:apply,^x:drop' \
             --preview='git stash show --color=always -p $(cut -d" " -f1 <<< {}) | head -'$LINES \
             --preview-window=down:70% --reverse \
             --bind='enter:execute(git stash show --color=always -p $(cut -d" " -f1 <<< {}) | less -r > /dev/tty)' \
             --bind='ctrl-d:execute(git diff --color=always $(cut -d" " -f1 <<< {}) | less -r > /dev/tty)' \
             --bind='alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up' \
-            --expect=ctrl-o,ctrl-y,ctrl-x
+            --expect=ctrl-b,ctrl-o,ctrl-y,ctrl-x
       )
     )
     k=${out[0]}
     reflog=${out[1]}
     if [ -n "$reflog" ]; then
       case "$k" in
+        ctrl-b)
+          git stash branch "$(fzf-git-inputbox 'Enter a branchname: ')" "$reflog"
+          return
+          ;;
         ctrl-o) operation=pop;;
         ctrl-y) operation=apply;;
         ctrl-x) operation=drop;;
