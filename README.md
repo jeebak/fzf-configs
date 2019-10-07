@@ -57,6 +57,7 @@ CTRL-G CTRL-L for log
 CTRL-G L        ""
 
 CTRL-G CTRL-S for stashes # NOTE: this will "en-stash" upon invocation
+  CTRL-B: git stash branch <branchname>
   CTRL-O: git stash pop
   CTRL-Y: git stash apply
   CTRL-X: git stash drop
