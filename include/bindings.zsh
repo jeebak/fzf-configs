@@ -33,8 +33,11 @@ fzf-edit-file() {
 
   echo "Gathering list..."
   out="$(
-    (git ls-tree -r --name-only HEAD || find . -type f) 2> /dev/null |
-    fzf --tiebreak=index
+    ( git ls-tree -r --name-only HEAD ||
+      find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
+        sed s/^..//
+    ) 2> /dev/null |
+    FZF_DEFAULT_OPTS="--tiebreak=index $FZF_CTRL_T_OPTS --preview-window up:40%" fzf
   )"
 
   [[ -n "$out" ]] && LBUFFER="${EDITOR:-vim} \"$out\""
