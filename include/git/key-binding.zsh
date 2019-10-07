@@ -14,21 +14,15 @@ bind-git-helper() {
       LBUFFER+=\$result
     }
     zle -N fzf-g$c-widget
-    bindkey '^g^$c' fzf-g$c-widget"
+    [[ \$FZF_CONFIGS_NO_CONTROL = true ]] &&
+      bindkey '^g$c'  fzf-g$c-widget ||
+      bindkey '^g^$c' fzf-g$c-widget"
   done
 }
 
-bind-git-helper f b t r h
-
-# Add 2nd widget/binding
-# For example, for tmux users that have ^h mapped to "select-pane -L"
-fzf-gh2-widget() {
-  local result=$(fzf-git gh | join-lines)
-  zle reset-prompt
-  LBUFFER+=$result
-}
-zle -N fzf-gh2-widget
-bindkey '^gh' fzf-gh2-widget
+bind-git-helper f b t r h l
+# For tmux users that have ^{h,j,k,l} mapped to "select-pane -{L,D,U,R}"
+FZF_CONFIGS_NO_CONTROL=true bind-git-helper h j k l
 
 bind-git-helper-no-join() {
   local c

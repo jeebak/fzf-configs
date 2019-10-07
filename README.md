@@ -53,6 +53,9 @@ CTRL-G CTRL-R for remotes
 CTRL-G CTRL-H for commit hashes
 CTRL-G h        ""
 
+CTRL-G CTRL-L for log
+CTRL-G L        ""
+
 CTRL-G CTRL-S for stashes # NOTE: this will "en-stash" upon invocation
   CTRL-O: git stash pop
   CTRL-Y: git stash apply
