@@ -9,7 +9,7 @@ export FZF_PREVIEW_BIND="alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page
 
 # Try bat, highlight, coderay, rougify in turn, then fall back to cat
 export FZF_CTRL_T_OPTS="\
-  --bind="$FZF_PREVIEW_BIND" \
+  --bind='$FZF_PREVIEW_BIND' \
   --bind 'ctrl-o:execute(less {} > /dev/tty)' \
   --preview '[[ \$(file --mime {}) =~ binary ]] \
       && ([[ -d {} ]] && exa --color=always -Ta {} || tree -Ca {} || echo Binary: {}) 2> /dev/null \
@@ -27,7 +27,7 @@ export FZF_CTRL_T_OPTS="\
 #   Set FZF_ALT_C_COMMAND to override the default command
 #   Set FZF_ALT_C_OPTS to pass additional options
 export FZF_ALT_C_OPTS="\
-  --bind="$FZF_PREVIEW_BIND" \
+  --bind='$FZF_PREVIEW_BIND' \
   --bind 'ctrl-o:execute(less {} > /dev/tty)' \
   --preview '(exa --color=always -Ta {} || tree -Ca {}) 2> /dev/null | head -1000'"
 
