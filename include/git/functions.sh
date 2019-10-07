@@ -46,7 +46,7 @@ fzf-git-help() {
 
 gf() {
   is_in_git_repo || return
-  local header expect out pane_id
+  local header expect out pane_id file
 
   header="Ops:^a:add,^d:diff,^p:add -p,^r:revert,^x:rm,^y:amend-no-edit"
   expect="ctrl-a,ctrl-d,ctrl-p,ctrl-r,ctrl-x,ctrl-y"
@@ -82,8 +82,14 @@ gf() {
         ;;
       ctrl-x)
         if fzf-git-confirm "Really rm: ${out[*]:1}?"; then
-          git checkout -- "${out[@]:1}"
-          git rm -f "${out[@]:1}"
+          for file in "${out[@]:1}"; do
+            if git ls-files --error-unmatch "$file" > /dev/null; then
+              git checkout -- "${out[@]:1}"
+              git rm -f "$file"
+            else
+              rm -rf "$file"
+            fi
+          done
           git status | less -r > /dev/tty
         fi
         ;;
