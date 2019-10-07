@@ -4,19 +4,41 @@
 
 ## Installation
 
+<details>
+  <summary>Zsh</summary>
+
 Add to your `.zshrc`.
 
-### Using [zplug](https://github.com/zplug/zplug)
+#### Using [zplug](https://github.com/zplug/zplug)
 ```shell
 zplug jeebak/fzf-configs
 ```
 
-### Using [zgen](https://github.com/tarjoilija/zgen)
+#### Using [zgen](https://github.com/tarjoilija/zgen)
 ```shell
 zgen jeebak/fzf-configs
 zgen save
 ```
 etc. etc.
+
+#### Manually
+```
+git clone --depth 1 https://github.com/jeebak/fzf-configs ~/some/path/fzf-configs
+echo "source ~/some/path/fzf-configs/fzf-configs.plugin.zsh" >> ~/.zshrc
+```
+
+</details>
+
+<details>
+  <summary>Bash</summary>
+
+#### Manually
+```
+git clone --depth 1 https://github.com/jeebak/fzf-configs ~/some/path/fzf-configs
+echo "source ~/some/path/fzf-configs/fzf-configs.plugin.bash" >> ~/.bashrc
+```
+
+</details>
 
 Automatically [installs fzf](https://github.com/junegunn/fzf#installation) if
 `brew` (or `git`) is available.
