@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # GIT heart FZF
 # -------------
 
@@ -160,14 +162,30 @@ gl() {
           --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
   fzf --ansi --no-sort --reverse --tiebreak=index --toggle-sort=\` \
       --bind="$FZF_PREVIEW_BIND" \
-      --preview 'git show --color=always --stat -p {2}' \
+      --preview "printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
+                xargs -I % sh -c 'git diff --color=always %'" \
       --preview-window down:70% \
       --prompt="^d:diff,^l:log -p,^n:show --name-status,^w:word-diff,<enter>:show: " \
-      --bind "ctrl-d:execute: git diff --color=always                 {2}   | less -Rc > /dev/tty" \
-      --bind "ctrl-l:execute: git log  --color=always -p              {2}.. | less -Rc > /dev/tty" \
-      --bind "ctrl-n:execute: git show --color=always --name-status   {2}   | less -Rc > /dev/tty" \
-      --bind "ctrl-w:execute: git show --color=always -w --word-diff  {2}   | less -Rc > /dev/tty" \
-      --bind "ctrl-m:execute: git show --color=always                 {2}   | less -Rc > /dev/tty"
+      --bind "ctrl-d:execute:
+                printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
+                xargs -I % sh -c 'git diff --color=always % |
+                less -Rc > /dev/tty'" \
+      --bind "ctrl-l:execute:
+                printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
+                xargs -I % sh -c 'git log -p --color=always %.. |
+                less -Rc > /dev/tty'" \
+      --bind "ctrl-n:execute:
+                printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
+                xargs -I % sh -c 'git show --name-status --color=always %.. |
+                less -Rc > /dev/tty'" \
+      --bind "ctrl-w:execute:
+                printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
+                xargs -I % sh -c 'git show --color=always -w --word-diff % |
+                less -Rc > /dev/tty'" \
+      --bind "ctrl-m:execute:
+                printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
+                xargs -I % sh -c 'git show --color=always % |
+                less -Rc > /dev/tty'"
 }
 
 gs() {
