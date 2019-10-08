@@ -51,8 +51,8 @@ Automatically [installs fzf](https://github.com/junegunn/fzf#installation) if
 - https://github.com/wfxr/forgit
 
 ```
-FZF_PREVIEW_BIND="alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up"
-# Use: --bind="$FZF_PREVIEW_BIND" everywhere there's --preview
+FZF_PREVIEW_BINDINGS="alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up"
+# Use: --bind="$FZF_PREVIEW_BINDINGS" everywhere there's --preview
 
 # fzf's -m, --multi option ("Enable multi-select with tab/shift-tab") is used
 # whenever appropriate
