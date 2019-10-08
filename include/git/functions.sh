@@ -75,7 +75,7 @@ gf() {
         git add "${out[@]:1}"
         ;;
       ctrl-d)
-        git diff --color=always -- "${out[@]:1}" | less -r > /dev/tty
+        git diff --color=always --stat -p -- "${out[@]:1}" | less -r > /dev/tty
         ;;
       ctrl-r)
         if fzf-git-confirm "Really revert: ${fileslist}?"; then
@@ -185,7 +185,7 @@ gl() {
       --prompt="^d:diff,^l:log -p,^n:show --name-status,^w:word-diff,<enter>:show: " \
       --bind "ctrl-d:execute:
                 printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % sh -c 'git diff --color=always % |
+                xargs -I % sh -c 'git diff --color=always --stat -p % |
                 less -Rc > /dev/tty'" \
       --bind "ctrl-l:execute:
                 printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
@@ -227,7 +227,7 @@ gs() {
             --preview-window=down:70% --reverse \
             --bind="$FZF_PREVIEW_BINDINGS" \
             --bind='enter:execute(git stash show --color=always -p $(cut -d" " -f1 <<< {}) | less -r > /dev/tty)' \
-            --bind='ctrl-d:execute(git diff --color=always $(cut -d" " -f1 <<< {}) | less -r > /dev/tty)' \
+            --bind='ctrl-d:execute(git diff --color=always --stat -p $(cut -d" " -f1 <<< {}) | less -r > /dev/tty)' \
             --bind='alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up' \
             --expect=ctrl-b,ctrl-o,ctrl-y,ctrl-x
       )
