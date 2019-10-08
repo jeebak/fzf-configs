@@ -133,12 +133,60 @@ gf() {
 
 gb() {
   is_in_git_repo || return
-  git branch -a --color=always | grep -v '/HEAD\s' | sort |
-  fzf-down --ansi --multi --tac --preview-window right:70% \
-    --bind="$FZF_PREVIEW_BINDINGS" \
-    --preview 'git log --oneline --graph --date=short --color=always --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1) | head -'$LINES |
-  sed 's/^..//' | cut -d' ' -f1 |
-  sed 's#^remotes/##'
+  local header expect out branch yn msg branchlist
+
+  header="Ops:^o:checkout,^d:delete,alt-m:merge,^n:log --name-status,^p:log -p"
+  expect="ctrl-o,ctrl-d,alt-m"
+
+  out=(
+    $(git branch -a --color=always | grep -v '/HEAD\s' | sort |
+      fzf-down --ansi --multi --tac --preview-window right:70% \
+        --bind="$FZF_PREVIEW_BINDINGS" \
+        --header="$header" \
+        --expect="$expect" \
+        --bind "ctrl-n:execute:
+                  git log --color=always --stat --name-status \$(sed s'/* //' <<< {}) |
+                  less -Rc > /dev/tty" \
+        --bind "ctrl-p:execute:
+                  git log --color=always --stat -p \$(sed s'/* //' <<< {}) |
+                  less -Rc > /dev/tty" \
+        --preview 'git log --oneline --graph --date=short --color=always --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1) | head -'$LINES |
+        sed 's/^\(alt-.\)/  \1/;s/^\(ctrl-.\)/  \1/' | sed 's/^..//' | cut -d' ' -f1
+    )
+  )
+  k=${out[0]}
+  branch=${out[1]}
+  if [ -n "$branch" ]; then
+    branchlist="\n$(printf '  %s\n' "${out[@]:1}")\n"
+    case "$k" in
+      ctrl-o)
+        msg="$(git stash 2>&1)"
+        branch="$(sed 's#^remotes/[^/][^/]*/##' <<< "$branch")"
+        if git show-ref --verify --quiet "refs/heads/$branch"; then
+          msg="${msg}\n\n$(git checkout    "$branch" 2>&1)"
+        else
+          msg="${msg}\n\n$(git checkout -b "$branch" 2>&1)"
+        fi
+        ;;
+      ctrl-d)
+        if fzf-git-confirm "Really delete: ${branchlist}?"; then
+          for branch in "${out[@]:1}"; do
+            msg="${msg}\n$(git branch -D "$branch" 2>&1)"
+          done
+        fi
+        ;;
+      alt-m)
+        if fzf-git-confirm "Really merge: ${branch}?"; then
+          msg="${msg}\n$(git merge --stat "$branch" 2>&1)"
+        fi
+        ;;
+    esac
+    echo -e "$msg" | less -Rc > /dev/tty
+    return
+  fi
+  if [[ ${#out[@]} -gt 0 ]]; then
+    printf '%s\n' "${out[@]}" | sed 's#^remotes/##'
+  fi
 }
 
 gt() {
