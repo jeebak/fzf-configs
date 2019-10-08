@@ -52,8 +52,8 @@ gf() {
   expect="ctrl-a,ctrl-d,ctrl-r,ctrl-x,ctrl-y"
 
   if [[ -n "$TMUX" ]]; then
-    header="$header,^p:add -p,^e:edit,^o:commit"
-    expect="$expect,ctrl-p,ctrl-e,ctrl-o"
+    header="$header,^e:edit,^o:commit,^p:add -p"
+    expect="$expect,ctrl-e,ctrl-o,ctrl-p"
   fi
 
   while out=(
@@ -64,6 +64,9 @@ gf() {
       head -500' | sed 's/^\(ctrl-.\)/    \1/' | cut -c4- | sed 's/.* -> //'
     )
   ); do
+    if [[ ${#out[@]} -eq 1 && ${out[0]} == ctrl-* ]]; then
+      continue
+    fi
     fileslist="\n$(printf '  %s\n' "${out[@]:1}")\n"
     case ${out[0]} in
       ctrl-a)
@@ -101,10 +104,6 @@ gf() {
           git commit --amend --no-edit > /dev/null
         fi
         ;;
-      ctrl-p)
-        pane_id=$(tmux split-window -v -P -F "#{pane_id}")
-        tmux send-keys -t "$pane_id" "git add -p ${out[*]:1}; tmux wait-for -S add-p-done; exit" C-m\; wait-for add-p-done
-        ;;
       ctrl-e)
         pane_id=$(tmux split-window -v -P -F "#{pane_id}")
         tmux send-keys -t "$pane_id" "${EDITOR:-vim} ${out[*]:1}; tmux wait-for -S edit-done; exit" C-m\; wait-for edit-done
@@ -115,6 +114,10 @@ gf() {
           pane_id=$(tmux split-window -v -P -F "#{pane_id}")
           tmux send-keys -t "$pane_id" "git commit ${out[*]:1}; tmux wait-for -S commit-done; exit" C-m\; wait-for commit-done
         fi
+        ;;
+      ctrl-p)
+        pane_id=$(tmux split-window -v -P -F "#{pane_id}")
+        tmux send-keys -t "$pane_id" "git add -p ${out[*]:1}; tmux wait-for -S add-p-done; exit" C-m\; wait-for add-p-done
         ;;
       *)
         if [[ ${#out[@]} -gt 0 ]]; then
