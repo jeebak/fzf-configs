@@ -48,12 +48,12 @@ gf() {
   is_in_git_repo || return
   local header expect out pane_id file fileslist
 
-  header="Ops:^a:add,^d:diff,^p:add -p,^r:revert,^x:rm,^y:amend-no-edit"
-  expect="ctrl-a,ctrl-d,ctrl-p,ctrl-r,ctrl-x,ctrl-y"
+  header="Ops:^a:add,^d:diff,^r:revert,^x:rm,^y:amend-no-edit"
+  expect="ctrl-a,ctrl-d,ctrl-r,ctrl-x,ctrl-y"
 
   if [[ -n "$TMUX" ]]; then
-    header="$header,^e:edit,^o:commit"
-    expect="$expect,ctrl-e,ctrl-o"
+    header="$header,^p:add -p,^e:edit,^o:commit"
+    expect="$expect,ctrl-p,ctrl-e,ctrl-o"
   fi
 
   while out=(
@@ -71,9 +71,6 @@ gf() {
         ;;
       ctrl-d)
         git diff --color=always -- "${out[@]:1}" | less -r > /dev/tty
-        ;;
-      ctrl-p)
-        git add -p "${out[@]:1}" > /dev/tty
         ;;
       ctrl-r)
         if fzf-git-confirm "Really revert: ${fileslist}?"; then
@@ -103,6 +100,10 @@ gf() {
           git add "${out[@]:1}"
           git commit --amend --no-edit > /dev/null
         fi
+        ;;
+      ctrl-p)
+        pane_id=$(tmux split-window -v -P -F "#{pane_id}")
+        tmux send-keys -t "$pane_id" "git add -p ${out[*]:1}; tmux wait-for -S add-p-done; exit" C-m\; wait-for add-p-done
         ;;
       ctrl-e)
         pane_id=$(tmux split-window -v -P -F "#{pane_id}")
