@@ -46,7 +46,7 @@ fzf-git-help() {
 
 gf() {
   is_in_git_repo || return
-  local header expect out pane_id file
+  local header expect out pane_id file fileslist
 
   header="Ops:^a:add,^d:diff,^p:add -p,^r:revert,^x:rm,^y:amend-no-edit"
   expect="ctrl-a,ctrl-d,ctrl-p,ctrl-r,ctrl-x,ctrl-y"
@@ -64,6 +64,7 @@ gf() {
       head -500' | sed 's/^\(ctrl-.\)/    \1/' | cut -c4- | sed 's/.* -> //'
     )
   ); do
+    fileslist="\n$(printf '  %s\n' "${out[@]:1}")\n"
     case ${out[0]} in
       ctrl-a)
         git add "${out[@]:1}"
@@ -72,16 +73,20 @@ gf() {
         git diff --color=always -- "${out[@]:1}" | less -r > /dev/tty
         ;;
       ctrl-p)
-        git add -p "${out[@]:1}"
+        git add -p "${out[@]:1}" > /dev/tty
         ;;
       ctrl-r)
-        if fzf-git-confirm "Really revert: ${out[*]:1}?"; then
-          git checkout -- "${out[@]:1}"
+        if fzf-git-confirm "Really revert: ${fileslist}?"; then
+          for file in "${out[@]:1}"; do
+            if git ls-files --error-unmatch "$file" > /dev/null; then
+              git checkout -- "${out[@]:1}"
+            fi
+          done
           git status | less -r > /dev/tty
         fi
         ;;
       ctrl-x)
-        if fzf-git-confirm "Really rm: ${out[*]:1}?"; then
+        if fzf-git-confirm "Really rm: ${fileslist}?"; then
           for file in "${out[@]:1}"; do
             if git ls-files --error-unmatch "$file" > /dev/null; then
               git checkout -- "${out[@]:1}"
@@ -94,7 +99,7 @@ gf() {
         fi
         ;;
       ctrl-y)
-        if fzf-git-confirm "Really amend --no-edit: ${out[*]:1}?"; then
+        if fzf-git-confirm "Really amend --no-edit: ${fileslist}?"; then
           git add "${out[@]:1}"
           git commit --amend --no-edit > /dev/null
         fi
@@ -104,7 +109,7 @@ gf() {
         tmux send-keys -t "$pane_id" "${EDITOR:-vim} ${out[*]:1}; tmux wait-for -S edit-done; exit" C-m\; wait-for edit-done
         ;;
       ctrl-o)
-        if fzf-git-confirm "Really add and commit: ${out[*]:1}?"; then
+        if fzf-git-confirm "Really add and commit: ${fileslist}?"; then
           git add "${out[@]:1}"
           pane_id=$(tmux split-window -v -P -F "#{pane_id}")
           tmux send-keys -t "$pane_id" "git commit ${out[*]:1}; tmux wait-for -S commit-done; exit" C-m\; wait-for commit-done
