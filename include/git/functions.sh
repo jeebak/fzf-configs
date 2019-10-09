@@ -162,7 +162,7 @@ gb() {
     branchlist="\n$(printf '  %s\n' "${out[@]:1}")\n"
     case "$k" in
       ctrl-r)
-        msg="$(git checkout -b "$(fzf-git-inputbox 'Enter a branchname: ')" 2>&1)"
+        msg="$(git checkout -b "$(fzf-git-inputbox 'Enter a branchname: ')" "$branch" 2>&1)"
         ;;
       ctrl-o)
         msg="$(git stash 2>&1)"
