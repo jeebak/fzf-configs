@@ -40,7 +40,7 @@ bind-git-helper-no-join s
 
 unset -f bind-git-helper bind-git-helper-no-join
 
-bindkey -s '^g^_' "fzf-git\n"
-bindkey -s '^g^d' "git diff\n"
-bindkey -s '^g^e' "fzf-git edit-modified\n"
-bindkey -s '^g^g' "git status\n"
+bindkey -s '^g^_' "^ufzf-git\n^y"
+bindkey -s '^g^d' "^ugit diff\n^y"
+bindkey -s '^g^e' "^ufzf-git edit-modified\n^y"
+bindkey -s '^g^g' "^ugit status\n^y"
