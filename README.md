@@ -69,11 +69,12 @@ CTRL-G CTRL-F for files
   CTRL-P: git add -p ...
 
 CTRL-G CTRL-B for branches
+  CTRL-N: git log --name-status
+  CTRL-P: git log -p
+  CTRL-R: git checkout -b new-branch-name
   CTRL-O: git checkout ...  # NOTE: this WILL stash first, if dirty
   CTRL-D: git branch -D ...
   ALT-M:  git merge ...
-  CTRL-N: git log --name-status
-  CTRL-P: git log -p
 
 CTRL-G CTRL-T for tags
 CTRL-G CTRL-R for remotes
