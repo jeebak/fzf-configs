@@ -100,6 +100,8 @@ CTRL-G CTRL-/ for fzf-git help
 CTRL-G CTRL-D for git diff
 CTRL-G CTRL-E for edit modified files
 CTRL-G CTRL-G for git status
+CTRL-G CTRL-P for git pull
+CTRL-G ALT-P  for git push
 
 AVAILABLE:
 CTRL-G CTRL-V
@@ -124,6 +126,4 @@ CTRL-G CTRL-K
 
 CTRL-G CTRL-O
 CTRL-G CTRL-L
-
-CTRL-G CTRL-P
 ```
