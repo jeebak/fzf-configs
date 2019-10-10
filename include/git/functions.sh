@@ -3,6 +3,16 @@
 # GIT heart FZF
 # -------------
 
+# Quiet everything
+qt() {
+  "$@" > /dev/null 2>&1
+}
+
+# Redirect error to out
+reo() {
+  "$@" 2>&1
+}
+
 is_in_git_repo() {
   git rev-parse HEAD > /dev/null 2>&1
 }
@@ -14,9 +24,9 @@ fzf-down() {
 fzf-git-confirm() {
   local yn
 
-  if command -v whiptail > /dev/null; then
+  if qt command -v whiptail; then
     whiptail --yesno --defaultno "$1" 0 0 > /dev/tty
-  elif command -v dialog > /dev/null; then
+  elif qt command -v dialog; then
     dialog --defaultno --yesno "$1" 0 0 > /dev/tty
   else
     yn="$(fzf-git-inputbox "$1 [y|n] ")"
@@ -80,7 +90,7 @@ gf() {
       ctrl-r)
         if fzf-git-confirm "Really revert: ${fileslist}?"; then
           for file in "${out[@]:1}"; do
-            if git ls-files --error-unmatch "$file" > /dev/null; then
+            if qt git ls-files --error-unmatch "$file"; then
               git checkout -- "${out[@]:1}"
             fi
           done
@@ -90,7 +100,7 @@ gf() {
       ctrl-x)
         if fzf-git-confirm "Really rm: ${fileslist}?"; then
           for file in "${out[@]:1}"; do
-            if git ls-files --error-unmatch "$file" > /dev/null; then
+            if qt git ls-files --error-unmatch "$file"; then
               git checkout -- "${out[@]:1}"
               git rm -f "$file"
             else
@@ -103,7 +113,7 @@ gf() {
       ctrl-y)
         if fzf-git-confirm "Really amend --no-edit: ${fileslist}?"; then
           git add "${out[@]:1}"
-          git commit --amend --no-edit > /dev/null
+          qt git commit --amend --no-edit
         fi
         ;;
       ctrl-e)
@@ -162,27 +172,27 @@ gb() {
     branchlist="\n$(printf '  %s\n' "${out[@]:1}")\n"
     case "$k" in
       ctrl-r)
-        msg="$(git checkout -b "$(fzf-git-inputbox 'Enter a branchname: ')" "$branch" 2>&1)"
+        msg="$(reo git checkout -b "$(fzf-git-inputbox 'Enter a branchname: ')" "$branch")"
         ;;
       ctrl-o)
-        msg="$(git stash 2>&1)"
+        msg="$(reo git stash)"
         branch="$(sed 's#^remotes/[^/][^/]*/##' <<< "$branch")"
         if git show-ref --verify --quiet "refs/heads/$branch"; then
-          msg="${msg}\n\n$(git checkout    "$branch" 2>&1)"
+          msg="${msg}\n\n$(reo git checkout    "$branch")"
         else
-          msg="${msg}\n\n$(git checkout -b "$branch" 2>&1)"
+          msg="${msg}\n\n$(reo git checkout -b "$branch")"
         fi
         ;;
       ctrl-d)
         if fzf-git-confirm "Really delete: ${branchlist}?"; then
           for branch in "${out[@]:1}"; do
-            msg="${msg}\n$(git branch -D "$branch" 2>&1)"
+            msg="${msg}\n$(reo git branch -D "$branch")"
           done
         fi
         ;;
       alt-m)
         if fzf-git-confirm "Really merge: ${branch}?"; then
-          msg="${msg}\n$(git merge --stat "$branch" 2>&1)"
+          msg="${msg}\n$(reo git merge --stat "$branch")"
         fi
         ;;
     esac
