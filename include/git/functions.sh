@@ -13,6 +13,18 @@ reo() {
   "$@" 2>&1
 }
 
+_pager() {
+  if [[ $# -eq 0 ]]; then
+    cat -    | less -Rc > /dev/tty
+  else
+    reo "$@" | less -Rc > /dev/tty
+  fi
+}
+
+# Export the above functions, making them available to fzf's bind execute
+export SHELL=bash
+eval "$(declare -F | sed -e 's/-f /-fx /')"
+
 is_in_git_repo() {
   git rev-parse HEAD > /dev/null 2>&1
 }
@@ -87,7 +99,7 @@ gf() {
         git add "${out[@]:1}"
         ;;
       ctrl-d)
-        git diff --color=always --stat -p -- "${out[@]:1}" | less -r > /dev/tty
+        _pager git diff --color=always --stat -p -- "${out[@]:1}"
         ;;
       ctrl-r)
         if fzf-git-confirm "Really revert: ${fileslist}?"; then
@@ -96,7 +108,7 @@ gf() {
               git checkout -- "${out[@]:1}"
             fi
           done
-          git status | less -r > /dev/tty
+          _pager git status
         fi
         ;;
       ctrl-x)
@@ -109,7 +121,7 @@ gf() {
               rm -rf "$file"
             fi
           done
-          git status | less -r > /dev/tty
+          _pager git status
         fi
         ;;
       ctrl-y)
@@ -119,7 +131,7 @@ gf() {
         fi
         ;;
       ctrl-h)
-        git log -p "${out[@]:1}" | less -Rc > /dev/tty
+        _pager git log --color=always -p "${out[@]:1}"
         ;;
       ctrl-e)
         pane_id=$(tmux split-window -v -P -F "#{pane_id}")
@@ -162,11 +174,9 @@ gb() {
         --prompt="$prompt" \
         --expect="$expect" \
         --bind "ctrl-n:execute:
-                  git log --color=always --stat --name-status \$(sed s'/* //' <<< {}) |
-                  less -Rc > /dev/tty" \
+                  _pager git log --color=always --stat --name-status \$(sed s'/* //' <<< {})" \
         --bind "ctrl-p:execute:
-                  git log --color=always --stat -p \$(sed s'/* //' <<< {}) |
-                  less -Rc > /dev/tty" \
+                  _pager git log --color=always --stat -p \$(sed s'/* //' <<< {})" \
         --preview 'git log --oneline --graph --date=short --color=always --pretty="format:%C(auto)%cd %h%d %s" $(sed s/^..// <<< {} | cut -d" " -f1) | head -'$LINES |
         sed 's/^\(alt-.\)/  \1/;s/^\(ctrl-.\)/  \1/' | sed 's/^..//' | cut -d' ' -f1
     )
@@ -201,7 +211,7 @@ gb() {
         fi
         ;;
     esac
-    echo -e "$msg" | less -Rc > /dev/tty
+    echo -e "$msg" | _pager
     return
   fi
   if [[ ${#out[@]} -gt 0 ]]; then
@@ -248,29 +258,29 @@ gl() {
   fzf --ansi --no-sort --reverse --tiebreak=index --toggle-sort=\` \
       --bind="$FZF_PREVIEW_BINDINGS" \
       --preview "printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % sh -c 'git diff --color=always %'" \
+                xargs -I % bash -c 'git diff --color=always %'" \
       --preview-window down:70% \
       --prompt="^d:diff,^l:log -p,^n:show --name-status,^w:word-diff,<enter>:show: " \
       --bind "ctrl-d:execute:
                 printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % sh -c 'git diff --color=always --stat -p % |
-                less -Rc > /dev/tty'" \
+                xargs -I % bash -c 'git diff --color=always --stat -p % |
+                _pager'" \
       --bind "ctrl-l:execute:
                 printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % sh -c 'git log -p --color=always %.. |
-                less -Rc > /dev/tty'" \
+                xargs -I % bash -c 'git log --color=always -p %.. |
+                _pager'" \
       --bind "ctrl-n:execute:
                 printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % sh -c 'git show --name-status --color=always %.. |
-                less -Rc > /dev/tty'" \
+                xargs -I % bash -c 'git show --color=always --name-status %.. |
+                _pager'" \
       --bind "ctrl-w:execute:
                 printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % sh -c 'git show --color=always -w --word-diff % |
-                less -Rc > /dev/tty'" \
+                xargs -I % bash -c 'git show --color=always -w --word-diff % |
+                _pager'" \
       --bind "ctrl-m:execute:
                 printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % sh -c 'git show --color=always % |
-                less -Rc > /dev/tty'"
+                xargs -I % bash -c 'git show --color=always % |
+                _pager'"
 }
 
 gs() {
@@ -294,8 +304,8 @@ gs() {
             --preview='git stash show --color=always -p $(cut -d" " -f1 <<< {}) | head -'$LINES \
             --preview-window=down:70% --reverse \
             --bind="$FZF_PREVIEW_BINDINGS" \
-            --bind='enter:execute(git stash show --color=always -p $(cut -d" " -f1 <<< {}) | less -r > /dev/tty)' \
-            --bind='ctrl-d:execute(git diff --color=always --stat -p $(cut -d" " -f1 <<< {}) | less -r > /dev/tty)' \
+            --bind='enter:execute(_pager git stash show --color=always -p $(cut -d" " -f1 <<< {}))' \
+            --bind='ctrl-d:execute(_pager git diff --color=always --stat -p $(cut -d" " -f1 <<< {}))' \
             --bind='alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up' \
             --expect=ctrl-b,ctrl-o,ctrl-y,ctrl-x
       )
