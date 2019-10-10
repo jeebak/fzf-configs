@@ -56,10 +56,11 @@ fzf-git-help() {
 
 gf() {
   is_in_git_repo || return
-  local header expect out pane_id file fileslist
+  local header prompt expect out pane_id file fileslist
 
   header="Ops:^a:add,^d:diff,^r:revert,^x:rm,^y:amend-no-edit"
-  expect="ctrl-a,ctrl-d,ctrl-r,ctrl-x,ctrl-y"
+  prompt="...   ^h:history: "
+  expect="ctrl-a,ctrl-d,ctrl-r,ctrl-x,ctrl-y,ctrl-h"
 
   if [[ -n "$TMUX" ]]; then
     header="$header,^e:edit,^o:commit,^p:add -p"
@@ -69,8 +70,9 @@ gf() {
   while out=(
     $(git -c color.status=always status --short |
       fzf -m --ansi --nth 2..,.. \
-        --header="$header" \
         --bind="$FZF_PREVIEW_BINDINGS" \
+        --header="$header" \
+        --prompt="$prompt" \
         --expect="$expect" \
         --preview '(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) |
       head -500' | sed 's/^\(ctrl-.\)/    \1/' | cut -c4- | sed 's/.* -> //'
@@ -115,6 +117,9 @@ gf() {
           git add "${out[@]:1}"
           qt git commit --amend --no-edit
         fi
+        ;;
+      ctrl-h)
+        git log -p "${out[@]:1}" | less -Rc > /dev/tty
         ;;
       ctrl-e)
         pane_id=$(tmux split-window -v -P -F "#{pane_id}")
