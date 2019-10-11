@@ -37,9 +37,7 @@ fzf-git-confirm() {
   local yn
 
   if qt command -v whiptail; then
-    whiptail --yesno --defaultno "$1" 0 0 > /dev/tty
-  elif qt command -v dialog; then
-    dialog --defaultno --yesno "$1" 0 0 > /dev/tty
+    reo whiptail --yesno --defaultno "$1" 0 0 > /dev/tty
   else
     yn="$(fzf-git-inputbox "$1 [y|n] ")"
     [[ $yn =~ [yY] ]]

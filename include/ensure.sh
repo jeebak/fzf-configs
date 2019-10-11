@@ -12,4 +12,10 @@ if ! command -v fzf  > /dev/null; then
   fi
 fi
 
+if ! command -v whiptail  > /dev/null; then
+  if command -v brew      > /dev/null; then
+    brew install newt
+  fi
+fi
+
 hash > /dev/null 2>&1
