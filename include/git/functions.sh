@@ -171,13 +171,13 @@ gb() {
   is_in_git_repo || return
   local header prompt expect out branch yn msg branchlist
 
-  header="Ops:^n:log --name-status,^p:log -p,^r:new"
+  header="Ops:^n:log --name-status,^p:log -p,^r:rename,^w:new"
   prompt="...   ^o:checkout,^x:delete,alt-m:merge: "
   expect="ctrl-r,ctrl-o,ctrl-x,alt-m"
 
   out=(
     $(git branch -a --color=always | grep -v '/HEAD\s' | sort |
-      fzf-down --ansi --multi --tac --preview-window right:70% \
+      fzf-down --ansi --multi --tac --preview-window up:70% \
         --bind="$FZF_PREVIEW_BINDINGS" \
         --header="$header" \
         --prompt="$prompt" \
@@ -196,6 +196,9 @@ gb() {
     branchlist="\n$(printf '  %s\n' "${out[@]:1}")\n"
     case "$k" in
       ctrl-r)
+        msg="$(reo git branch -m "$branch" "$(fzf-git-inputbox 'Enter a branchname: ' -q "$branch")")"
+        ;;
+      ctrl-w)
         msg="$(reo git checkout -b "$(fzf-git-inputbox 'Enter a branchname: ')" "$branch")"
         ;;
       ctrl-o)

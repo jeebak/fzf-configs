@@ -71,7 +71,8 @@ CTRL-G CTRL-F for files
 CTRL-G CTRL-B for branches
   CTRL-N: git log --name-status
   CTRL-P: git log -p
-  CTRL-R: git checkout -b <new_branch> <start_point> # NOTE: <start_point> is the current branch under the cursor
+  CTRL-R: git branch   -m <oldbranch>  <newbranch>   # NOTE: <oldbranch>   is the current branch under the cursor
+  CTRL-W: git checkout -b <new_branch> <start_point> # NOTE: <start_point> is the current branch under the cursor
   CTRL-O: git checkout ...  # NOTE: this WILL stash first, if dirty
   CTRL-D: git branch -D ...
   ALT-M:  git merge ...
