@@ -8,6 +8,11 @@ qt() {
   "$@" > /dev/null 2>&1
 }
 
+# Quiet stderr
+qte() {
+  "$@" 2> /dev/null
+}
+
 # Redirect error to out
 reo() {
   "$@" 2>&1
@@ -66,6 +71,12 @@ fzf-git-help() {
 
 gf() {
   is_in_git_repo || return
+
+  # Return right away if index is clean
+  if git diff --quiet && ! qte git status --porcelain | qt grep "^??"; then
+    return
+  fi
+
   local header prompt expect out pane_id file fileslist
 
   header="Ops:^a:add,^d:diff,^r:revert,^x:rm,^y:amend-no-edit"
