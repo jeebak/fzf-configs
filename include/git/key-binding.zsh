@@ -41,11 +41,11 @@ bind-git-helper-no-join s
 
 unset -f bind-git-helper bind-git-helper-no-join
 
-bindkey -s '^g^_' "^ufzf-git\n^y"
-bindkey -s '^g^d' "^ugit diff\n^y"
-bindkey -s '^g^e' "^ufzf-git edit-modified\n^y"
-bindkey -s '^g^g' "^ugit status\n^y"
-bindkey -s '^g^p' "^ugit pull\n^y"
+bindkey -s '^g^_' " ^ufzf-git\n^y^h"
+bindkey -s '^g^d' " ^ugit diff\n^y^h"
+bindkey -s '^g^e' " ^ufzf-git edit-modified\n^y^h"
+bindkey -s '^g^g' " ^ugit status\n^y^h"
+bindkey -s '^g^p' " ^ugit pull\n^y^h"
 # NOTE: no "\n^y" like the others; both to allow to add extra params, and as a
 # safguard
-bindkey -s '^g^[p' "^ugit push "
+bindkey -s '^g^[p' " ^ugit push ^h"
