@@ -12,6 +12,7 @@ bind-git-helper() {
       local result=\$(fzf-git g$c | join-lines)
       zle reset-prompt
       LBUFFER+=\$result
+      [[ -z \$result ]] && zle accept-line
     }
     zle -N fzf-g$c-widget
     [[ \$FZF_CONFIGS_NO_CONTROL = true ]] &&
