@@ -161,8 +161,8 @@ gb() {
   local header prompt expect out branch yn msg branchlist
 
   header="Ops:^n:log --name-status,^p:log -p,^r:new"
-  prompt="...   ^o:checkout,^d:delete,alt-m:merge: "
-  expect="ctrl-r,ctrl-o,ctrl-d,alt-m"
+  prompt="...   ^o:checkout,^x:delete,alt-m:merge: "
+  expect="ctrl-r,ctrl-o,ctrl-x,alt-m"
 
   out=(
     $(git branch -a --color=always | grep -v '/HEAD\s' | sort |
@@ -196,7 +196,7 @@ gb() {
           msg="${msg}\n\n$(reo git checkout -b "$branch")"
         fi
         ;;
-      ctrl-d)
+      ctrl-x)
         if fzf-git-confirm "Really delete: ${branchlist}?"; then
           for branch in "${out[@]:1}"; do
             msg="${msg}\n$(reo git branch -D "$branch")"
@@ -209,7 +209,7 @@ gb() {
         fi
         ;;
     esac
-    echo -e "$msg" | _pager
+    [[ -n "$msg" ]] && echo -e "$msg" | _pager
     return
   fi
   if [[ ${#out[@]} -gt 0 ]]; then
