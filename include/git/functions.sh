@@ -74,6 +74,28 @@ fzf-git-help() {
 }
 
 # -----------------------------------------------------------------------------
+# q w e r t \ y u i o i p
+#  a s d f g \ h j k l
+#   z x c v b \ n m
+
+# ctrl-{x}
+# reserved:   bfgnp # fzf abort,
+#             hjkl  # tmux select-pane -{L,D,U,R}
+# available:  qwertyuio asd zxcvm
+#   ctrl-a:   add
+#   ctrl-d:   diff
+#   ctrl-e:   edit
+#   ctrl-h:   history
+#   ctrl-l:   log
+#   ctrl-m:   accept/show
+#   ctrl-n:   log --name-status
+#   ctrl-o:   commit/checkout/stash pop
+#   ctrl-p:   add -p/log -p
+#   ctrl-r:   revert, rename
+#   ctrl-u:   update
+#   ctrl-w:   new branchname, word diff
+#   ctrl-x:   rm, delete, cut
+#   ctrl-y:   update/amend no-edit
 
 gf() {
   is_in_git_repo || return
