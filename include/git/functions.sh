@@ -173,7 +173,7 @@ gb() {
 
   header="Ops:^n:log --name-status,^p:log -p,^r:rename,^w:new"
   prompt="...   ^o:checkout,^x:delete,alt-m:merge: "
-  expect="ctrl-r,ctrl-o,ctrl-x,alt-m"
+  expect="ctrl-r,ctrl-w,ctrl-o,ctrl-x,alt-m"
 
   out=(
     $(git branch -a --color=always | grep -v '/HEAD\s' | sort |
