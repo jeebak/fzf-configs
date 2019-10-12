@@ -96,8 +96,6 @@ gf() {
       --header="$header" \
       --prompt="$prompt" \
       --expect="$expect" \
-      --bind="$FZF_PREVIEW_BINDINGS" \
-      --preview-window="$FZF_PREVIEW_WINDOW" \
       --preview='(
         git diff --color=always -- {-1} | sed 1,4d; cat {-1}
       ) | head -500' | sed 's/^\(ctrl-.\)/    \1/' | cut -c4- | sed 's/.* -> //'
@@ -193,14 +191,12 @@ gb() {
       --header="$header" \
       --prompt="$prompt" \
       --expect="$expect" \
-      --bind="$FZF_PREVIEW_BINDINGS" \
       --bind="ctrl-n:execute:
                 _pager git log --color=always --stat \
                   --name-status \$(sed s'/* //' <<< {})" \
       --bind="ctrl-p:execute:
                 _pager git log --color=always --stat \
                   -p \$(sed s'/* //' <<< {})" \
-      --preview-window="$FZF_PREVIEW_WINDOW" \
       --preview='git log --color=always --oneline --graph --date=short \
                   --pretty="format:%C(auto)%cd %h%d %s" \
                   $(sed s/^..// <<< {} | cut -d" " -f1) | head -'$LINES |
@@ -258,8 +254,6 @@ gt() {
   is_in_git_repo || return
   git tag --sort -version:refname |
   fzf-down --multi \
-    --bind="$FZF_PREVIEW_BINDINGS" \
-    --preview-window="$FZF_PREVIEW_WINDOW" \
     --preview='git show --color=always {} | head -'$LINES
 }
 
@@ -269,7 +263,6 @@ gh() {
     --graph --color=always |
   fzf-down --ansi --no-sort --reverse --multi \
     --header 'Press CTRL-S to toggle sort' \
-    --bind="$FZF_PREVIEW_BINDINGS" \
     --bind='ctrl-s:toggle-sort' \
     --preview='grep -o "[a-f0-9]\{7,\}" <<< {} |
                 xargs git show --color=always | head -'$LINES |
@@ -280,7 +273,6 @@ gr() {
   is_in_git_repo || return
   git remote -v | awk '{print $1 "\t" $2}' | uniq |
   fzf-down --tac \
-    --bind="$FZF_PREVIEW_BINDINGS" \
     --preview='git log --oneline --graph --date=short \
                 --pretty="format:%C(auto)%cd %h%d %s" {1} | head -200' |
   cut -d$'\t' -f1
@@ -307,7 +299,6 @@ gl() {
           --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
   fzf --ansi --no-sort --reverse --tiebreak=index --toggle-sort=\` \
       --prompt="$prompt" \
-      --bind="$FZF_PREVIEW_BINDINGS" \
       --bind="ctrl-d:execute:
                 printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
                 xargs -I % bash -c 'git diff --color=always --stat -p % |
@@ -328,7 +319,6 @@ gl() {
                 printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
                 xargs -I % bash -c 'git show --color=always % |
                 _pager'" \
-      --preview-window="$FZF_PREVIEW_WINDOW" \
       --preview="printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
                 xargs -I % bash -c 'git diff --color=always %'"
 }
@@ -346,8 +336,6 @@ gs() {
   # Stash, if dirty
   if git diff --quiet || yn=$(
     fzf-git-inputbox "Should I stash this? [y|n] " \
-      --bind="$FZF_PREVIEW_BINDINGS" \
-      --preview-window="$FZF_PREVIEW_WINDOW" \
       --preview='git diff --color=always'
   ); then
     [[ $yn =~ [yY] ]] && git stash
@@ -359,14 +347,12 @@ gs() {
           --header="$header" \
           --prompt="$prompt" \
           --expect="$expect" \
-          --bind="$FZF_PREVIEW_BINDINGS" \
           --bind='enter:execute(
             _pager git stash show --color=always -p $(cut -d" " -f1 <<< {})
           )' \
           --bind='ctrl-d:execute(
             _pager git diff --color=always --stat -p $(cut -d" " -f1 <<< {})
           )' \
-          --preview-window="$FZF_PREVIEW_WINDOW" \
           --preview='git stash show --color=always \
                       -p $(cut -d" " -f1 <<< {}) | head -'$LINES
     ))

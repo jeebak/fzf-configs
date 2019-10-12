@@ -1,8 +1,38 @@
+#!/usr/bin/env bash
+
 export PATH="${PLUGIN_D}/bin:${PATH}"
 
-# Debating on using FZF_DEFAULT_OPTS, but for now...
-export FZF_PREVIEW_BINDINGS="alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up"
-export FZF_PREVIEW_WINDOW="up:70%"
+FZF_DEFAULT_OPTS="$(
+  bindings=(
+    # Preview
+    alt-j:preview-down
+    alt-k:preview-up
+    ctrl-f:preview-page-down
+    ctrl-b:preview-page-up
+  )
+  # shellcheck disable=SC2178
+  bindings="${bindings[*]}"
+
+  echo "
+# Keybindings
+    --bind=${bindings// /,}
+
+# https://github.com/junegunn/fzf/wiki/Color-schemes#seoul256-dusk
+# Seoul256 Dusk
+    --color fg:242,bg:236,hl:65,fg+:15,bg+:239,hl+:108
+    --color info:108,prompt:109,spinner:108,pointer:168,marker:168
+# Seoul256 Night
+#   --color fg:242,bg:233,hl:65,fg+:15,bg+:234,hl+:108
+#   --color info:108,prompt:109,spinner:108,pointer:168,marker:168
+
+# Misc
+    --preview-window='up:70%'
+# I hate meeses to pieces... in fzf
+    --no-mouse
+  " | sed 's/#.*//;s/  */ /g;/^ *$/d'
+)"
+
+export FZF_DEFAULT_OPTS
 
 # CTRL-T - Paste the selected files and directories onto the command-line
 #   Set FZF_CTRL_T_COMMAND to override the default command
@@ -11,7 +41,6 @@ export FZF_PREVIEW_WINDOW="up:70%"
 
 # Try bat, highlight, coderay, rougify in turn, then fall back to cat
 export FZF_CTRL_T_OPTS="\
-  --bind='$FZF_PREVIEW_BINDINGS' \
   --bind 'ctrl-o:execute(less {} > /dev/tty)' \
   --preview '[[ \$(file --mime {}) =~ binary ]] \
       && ([[ -d {} ]] && exa --color=always -Ta {} || tree -Ca {} || echo Binary: {}) 2> /dev/null \
@@ -29,7 +58,6 @@ export FZF_CTRL_T_OPTS="\
 #   Set FZF_ALT_C_COMMAND to override the default command
 #   Set FZF_ALT_C_OPTS to pass additional options
 export FZF_ALT_C_OPTS="\
-  --bind='$FZF_PREVIEW_BINDINGS' \
   --bind 'ctrl-o:execute(less {} > /dev/tty)' \
   --preview '(exa --color=always -Ta {} || tree -Ca {}) 2> /dev/null | head -1000'"
 
