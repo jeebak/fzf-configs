@@ -83,6 +83,8 @@ CTRL-G CTRL-R for remotes
 CTRL-G CTRL-H for commit hashes
 CTRL-G h        ""
 
+CTRL-G CTRL-A for Aliases
+
 CTRL-G CTRL-L for log
 CTRL-G L        ""
   CTRL-D: git diff ...

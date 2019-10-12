@@ -21,7 +21,7 @@ bind-git-helper() {
   done
 }
 
-bind-git-helper f b t r h l
+bind-git-helper f b t r h l a
 # For tmux users that have ^{h,j,k,l} mapped to "select-pane -{L,D,U,R}"
 FZF_CONFIGS_NO_CONTROL=true bind-git-helper h j k l
 

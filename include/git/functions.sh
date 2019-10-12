@@ -69,6 +69,8 @@ fzf-git-help() {
   "$cmd" "$PLUGIN_D/README.md" < /dev/tty > /dev/tty
 }
 
+# -----------------------------------------------------------------------------
+
 gf() {
   is_in_git_repo || return
 
@@ -282,6 +284,13 @@ gr() {
 }
 
 # -----------------------------------------------------------------------------
+
+# WIP
+ga() {
+  git config --get-regexp 'alias.*' |
+    sed 's/^alias\.\([^ ]*\) \(.*\)/ \1#=> \2/' | column -s'#' -t | sort |
+  fzf-down | awk '{ print $1; }'
+}
 
 gl() {
   is_in_git_repo || return
