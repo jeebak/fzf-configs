@@ -10,9 +10,15 @@ bind-git-helper() {
   for c in $@; do
     eval "fzf-g$c-widget() {
       local result=\$(fzf-git g$c | join-lines)
+      local buffer=\$BUFFER
       zle reset-prompt
-      LBUFFER+=\$result
-      [[ -z \$result ]] && zle accept-line
+      if [[ -n \$result ]]; then
+        LBUFFER+=\$result
+      else
+        zle kill-whole-line
+        zle accept-line
+        print -z "\$buffer"
+      fi
     }
     zle -N fzf-g$c-widget
     [[ \$FZF_CONFIGS_NO_CONTROL = true ]] &&
