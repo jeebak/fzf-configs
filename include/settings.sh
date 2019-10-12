@@ -82,3 +82,39 @@ if command -v fd > /dev/null; then
     fd --type d --hidden --follow --exclude ".git" . "$1"
   }
 fi
+
+# -----------------------------------------------------------------------------
+# This is zsh only
+
+if command -v zle > /dev/null; then
+  # Custom fuzzy completion for user configured commands
+
+  # Based on: fzf-completion
+  _fzf-configs-completion() {
+    local tokens cmd fzf matches
+    setopt localoptions noshwordsplit noksh_arrays noposixbuiltins
+
+    tokens=(${(z)LBUFFER})
+    if [ ${#tokens} -lt 1 ]; then
+      zle expand-or-complete
+      return
+    fi
+
+    cmd=${tokens[1]}
+
+    if [ -f  "$HOME/.config/fzf-configs/completions/${cmd}.zsh" -a ${LBUFFER[-1]} = ' ' ]; then
+      fzf="$(__fzfcmd_complete)"
+      source "$HOME/.config/fzf-configs/completions/${cmd}.zsh"
+      # See README.md for more info on how to use this.
+      if [ -n "$matches" ]; then
+        LBUFFER="$LBUFFER$matches"
+      fi
+      zle reset-prompt
+    else
+      zle expand-or-complete
+    fi
+  }
+  zle -N  _fzf-configs-completion
+
+  export fzf_default_completion=_fzf-configs-completion
+fi

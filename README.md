@@ -43,6 +43,28 @@ echo "source ~/some/path/fzf-configs/fzf-configs.plugin.bash" >> ~/.bashrc
 Automatically [installs fzf](https://github.com/junegunn/fzf#installation) if
 `brew` (or `git`) is available.
 
+## Simple Completion for Custom commands/scripts (`zsh` only)
+
+The `include/settings.sh` file contains `_fzf-configs-completion()` that we're
+using for `fzf_default_completion`. For example, to add your own completions
+for a custom script named `doge`, create a file named:
+
+- `$HOME/.config/fzf-configs/completions/doge.zsh`
+
+and add something like:
+
+```
+ matches=$(
+   echo "
+     option-1
+     option-2
+     option-3
+   " | sed 's/#.*//;s/  */ /g;/^ *$/d' | ${fzf}
+ )
+```
+
+This file **has** to contain something that uses `$fzf` and sets `$matches`.
+
 ## fzf-git
 - https://junegunn.kr/2016/07/fzf-git/
   - https://gist.github.com/junegunn/8b572b8d4b5eddd8b85e5f4d40f17236
