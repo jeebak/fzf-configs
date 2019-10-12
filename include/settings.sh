@@ -1,6 +1,8 @@
 export PATH="${PLUGIN_D}/bin:${PATH}"
 
+# Debating on using FZF_DEFAULT_OPTS, but for now...
 export FZF_PREVIEW_BINDINGS="alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up"
+export FZF_PREVIEW_WINDOW="up:70%"
 
 # CTRL-T - Paste the selected files and directories onto the command-line
 #   Set FZF_CTRL_T_COMMAND to override the default command
