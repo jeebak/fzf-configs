@@ -81,9 +81,9 @@ gf() {
 
   local header prompt expect out pane_id file fileslist
 
-  header="Ops:^a:add,^d:diff,^r:revert,^x:rm,^y:amend-no-edit"
-  prompt="...   ^h:history: "
-  expect="ctrl-a,ctrl-d,ctrl-r,ctrl-x,ctrl-y,ctrl-h"
+  header="Ops:^a:add,^r:revert,^x:rm,^y:amend-no-edit"
+  prompt="...   ^d:diff,^word-diff,^h:history: "
+  expect="ctrl-a,ctrl-r,ctrl-x,ctrl-y,ctrl-d,ctrl-w,ctrl-h"
 
   if [[ -n "$TMUX" ]]; then
     header="$header,^e:edit,^o:commit,^p:add -p"
@@ -97,6 +97,7 @@ gf() {
       --prompt="$prompt" \
       --expect="$expect" \
       --bind="$FZF_PREVIEW_BINDINGS" \
+      --preview-window="$FZF_PREVIEW_WINDOW" \
       --preview='(
         git diff --color=always -- {-1} | sed 1,4d; cat {-1}
       ) | head -500' | sed 's/^\(ctrl-.\)/    \1/' | cut -c4- | sed 's/.* -> //'
@@ -108,9 +109,6 @@ gf() {
     case ${out[0]} in
       ctrl-a)
         git add "${out[@]:1}"
-        ;;
-      ctrl-d)
-        _pager git diff --color=always --stat -p -- "${out[@]:1}"
         ;;
       ctrl-r)
         if fzf-git-confirm "Really revert: ${fileslist}?"; then
@@ -140,6 +138,12 @@ gf() {
           git add "${out[@]:1}"
           qt git commit --amend --no-edit
         fi
+        ;;
+      ctrl-d)
+        _pager git diff --color=always --stat -p -- "${out[@]:1}"
+        ;;
+      ctrl-w)
+        _pager git diff --color=always -w --word-diff -- "${out[@]:1}"
         ;;
       ctrl-h)
         _pager git log --color=always -p "${out[@]:1}"
