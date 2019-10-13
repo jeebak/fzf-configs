@@ -30,6 +30,9 @@ _pager() {
 export SHELL=bash
 eval "$(declare -F | sed -e 's/-f /-fx /')"
 
+# Lines of "preview"
+LINES=1000
+
 is_in_git_repo() {
   git rev-parse HEAD > /dev/null 2>&1
 }
@@ -82,12 +85,12 @@ gf() {
   local header prompt expect out pane_id file fileslist
 
   header="Ops:^a:add,^r:revert,^x:rm,^y:amend-no-edit"
-  prompt="...   ^d:diff,^word-diff,^h:history: "
-  expect="ctrl-a,ctrl-r,ctrl-x,ctrl-y,ctrl-d,ctrl-w,ctrl-h"
+  prompt="...   ^d:diff,^w:word-diff,^h:history: "
+  expect="ctrl-a,ctrl-r,ctrl-x,ctrl-y"
 
   if [[ -n "$TMUX" ]]; then
-    header="$header,^e:edit,^o:commit,^p:add -p"
-    expect="$expect,ctrl-e,ctrl-o,ctrl-p"
+    header="$header,^u:amend,^e:edit,^o:commit,^p:add -p"
+    expect="$expect,ctrl-u,ctrl-e,ctrl-o,ctrl-p"
   fi
 
   while out=($(
@@ -96,9 +99,15 @@ gf() {
       --header="$header" \
       --prompt="$prompt" \
       --expect="$expect" \
-      --preview='(
-        git diff --color=always -- {-1} | sed 1,4d; cat {-1}
-      ) | head -500' | sed 's/^\(ctrl-.\)/    \1/' | cut -c4- | sed 's/.* -> //'
+      --bind="ctrl-d:execute: _pager git diff --color=always \
+        --stat -p -- '{-1}'" \
+      --bind="ctrl-w:execute: _pager git diff --color=always \
+        -w --word-diff -- '{-1}'" \
+      --bind="ctrl-h:execute: _pager git log  --color=always \
+        -p '{-1}'" \
+      --preview="(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) |
+        head -$LINES" |
+    sed 's/^\(ctrl-.\)/    \1/' | cut -c4- | sed 's/.* -> //'
   )); do
     if [[ ${#out[@]} -eq 1 && ${out[0]} == ctrl-* ]]; then
       continue
@@ -132,19 +141,19 @@ gf() {
         fi
         ;;
       ctrl-y)
-        if fzf-git-confirm "Really amend --no-edit: ${fileslist}?"; then
+        if fzf-git-confirm "Really add and amend --no-edit: ${fileslist}?"; then
           git add "${out[@]:1}"
           qt git commit --amend --no-edit
         fi
         ;;
-      ctrl-d)
-        _pager git diff --color=always --stat -p -- "${out[@]:1}"
-        ;;
-      ctrl-w)
-        _pager git diff --color=always -w --word-diff -- "${out[@]:1}"
-        ;;
-      ctrl-h)
-        _pager git log --color=always -p "${out[@]:1}"
+      ctrl-u)
+        if fzf-git-confirm "Really add and amend: ${fileslist}?"; then
+          git add "${out[@]:1}"
+          pane_id=$(tmux split-window -v -P -F "#{pane_id}")
+          tmux send-keys -t "$pane_id" \
+            "git commit --amend ${out[*]:1}; tmux wait-for -S amend-done; exit" \
+              C-m\; wait-for amend-done
+        fi
         ;;
       ctrl-e)
         pane_id=$(tmux split-window -v -P -F "#{pane_id}")

@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 PLUGIN_D="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
-# Lines of "preview"
-export LINES=1000
 # -----------------------------------------------------------------------------
 source "$PLUGIN_D/include/git/functions.sh"
 # -----------------------------------------------------------------------------
