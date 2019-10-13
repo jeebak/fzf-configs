@@ -56,6 +56,7 @@ fzf-git-confirm() {
 
 fzf-git-inputbox() {
   # Prompt text as $1, w/ optional additional options
+  # shellcheck disable=SC2005
   echo "$(fzf --prompt "$@" --print-query <<< '')"
 }
 
@@ -280,9 +281,10 @@ gh() {
 gr() {
   is_in_git_repo || return
   git remote -v | awk '{print $1 "\t" $2}' | uniq |
-  fzf-down --tac \
-    --preview='git log --oneline --graph --date=short \
-                --pretty="format:%C(auto)%cd %h%d %s" {1} | head -200' |
+  fzf-down --tac --preview="
+    git log --oneline --graph --date=short --pretty='format:%C(auto)%cd %h%d %s' {1} |
+    head -$LINES
+  " |
   cut -d$'\t' -f1
 }
 
@@ -352,17 +354,17 @@ gs() {
     out=($(
       git stash list --pretty='%C(yellow)%gd %>(14)%Cgreen%cr %C(blue)%gs' |
       fzf --ansi --no-sort --border --reverse \
-          --header="$header" \
-          --prompt="$prompt" \
-          --expect="$expect" \
-          --bind='enter:execute(
-            _pager git stash show --color=always -p $(cut -d" " -f1 <<< {})
-          )' \
-          --bind='ctrl-d:execute(
-            _pager git diff --color=always --stat -p $(cut -d" " -f1 <<< {})
-          )' \
-          --preview='git stash show --color=always \
-                      -p $(cut -d" " -f1 <<< {}) | head -'$LINES
+        --header="$header" \
+        --prompt="$prompt" \
+        --expect="$expect" \
+        --bind="enter:execute(
+          _pager git stash show --color=always -p \$(cut -d' ' -f1 <<< {})
+        )" \
+        --bind="ctrl-d:execute(
+          _pager git diff --color=always --stat -p \$(cut -d' ' -f1 <<< {})
+        )" \
+        --preview="git stash show --color=always \
+          -p \$(cut -d' ' -f1 <<< {}) | head -$LINES"
     ))
     k=${out[0]}
     reflog=${out[1]}
@@ -387,7 +389,10 @@ gs() {
 
 edit-modified() {
   is_in_git_repo || { echo "Not in a git repo." && exit 1; }
-  "${EDITOR:-vim}" $(command git status -s | sed -ne 's/^ *MM* //p')
+  local files=(
+    $(command git status -s | sed -ne 's/^ *MM* //p')
+  )
+  "${EDITOR:-vim}" "${files[@]}"
 }
 
 # vim: set ft=bash:

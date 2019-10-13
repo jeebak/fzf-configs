@@ -1,13 +1,18 @@
+#!/usr/bin/env ksh
+# NOTE: the "ksh" is just to make shellcheck happy
+
 join-lines() {
   local item
-  while read item; do
+  # shellcheck disable=SC2034
+  while read -r item; do
+    # shellcheck disable=SC2154
     echo -n "${(q)item} "
   done
 }
 
 bind-git-helper() {
   local c
-  for c in $@; do
+  for c in "$@"; do
     eval "fzf-g$c-widget() {
       local result=\$(fzf-git g$c | join-lines)
       local buffer=\$BUFFER
@@ -17,7 +22,7 @@ bind-git-helper() {
       else
         zle kill-whole-line
         zle accept-line
-        print -z "\$buffer"
+        print -z \"\$buffer\"
       fi
     }
     zle -N fzf-g$c-widget
@@ -33,7 +38,7 @@ FZF_CONFIGS_NO_CONTROL=true bind-git-helper h j k l
 
 bind-git-helper-no-join() {
   local c
-  for c in $@; do
+  for c in "$@"; do
     eval "fzf-g$c-widget() {
       fzf-git g$c
       zle accept-line

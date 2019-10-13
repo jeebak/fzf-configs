@@ -1,10 +1,13 @@
+#!/usr/bin/env ksh
+# NOTE: the "ksh" is just to make shellcheck happy
+
 # Keybindings to trigger scripts.
 # Attempt to restore cmdline. Not perfect but OK for now :/.
 bindkey -s '\em' " ^ufzlp\n^y"
 
 # Based on: http://weblog.bulknews.net/post/89635306479/ghq-peco-percol
 #      and: https://gist.github.com/junegunn/f4fca918e937e6bf5bad
-function fzf-src () {
+fzf-src () {
   local out selected_dir
 
   echo "Gathering list..."
@@ -18,6 +21,7 @@ function fzf-src () {
   selected_dir="$(head -2 <<< "$out" | tail -1)"
 
   if [[ -n "$selected_dir" ]]; then
+    # shellcheck disable=SC2034
     BUFFER="cd ${selected_dir} && git status"
     zle accept-line
   fi

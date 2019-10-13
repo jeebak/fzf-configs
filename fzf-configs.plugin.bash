@@ -1,3 +1,6 @@
+#!/usr/bin/env bash
+# shellcheck disable=SC1090
+
 PLUGIN_D="$(dirname "${BASH_SOURCE[0]}")"
 
 source "$PLUGIN_D/include/ensure.sh"

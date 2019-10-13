@@ -7,7 +7,7 @@
 export LPASS_AGENT_TIMEOUT=0
 
 self="${0##/*/}"
-destdir="$(egrep -o '[^/]+/[^/]*$' <<< "${0%/bin/$self}")"
+destdir="$(grep -E -o '[^/]+/[^/]*$' <<< "${0%/bin/$self}")"
 confdir="${XDG_CONFIG_HOME:-$HOME/.config}/$destdir/creds/lastpass"
 
 readonly LP_USERNAME_FILE="$confdir/username.txt"
@@ -45,7 +45,8 @@ cmd_exists lpass  || die "You don't have lpass installed!"
 cmd_exists pbcopy || die "Uh oh! No pbcopy!"
 [[ ! -r "$LP_USERNAME_FILE" ]] && set_email
 
-lpass show you_dont_bring_me_flowers_you_dont_sing_me_love_songs 2>&1 | grep -q 'lpass login' && lpass login --trust $(cat "$LP_USERNAME_FILE")
+lpass show you_dont_bring_me_flowers_you_dont_sing_me_love_songs 2>&1 |
+  grep -q 'lpass login' && lpass login --trust <<< "$LP_USERNAME_FILE"
 
 while out=$(
   lpass ls --color=always |
@@ -57,7 +58,7 @@ while out=$(
 
   q=$(head -1 <<< "$out")
   k=$(head -2 <<< "$out" | tail -1)
-  id="$(sed '1,2d;/^$/d' <<< "$out" | egrep -o '\[id: [0-9]+\]' | egrep -o '[0-9]+')"
+  id="$(sed '1,2d;/^$/d' <<< "$out" | grep -E -o '\[id: [0-9]+\]' | grep -E -o '[0-9]+')"
 
   if [[ -z "$id" ]]; then
     msg='[ID WAS EMPTY] '
