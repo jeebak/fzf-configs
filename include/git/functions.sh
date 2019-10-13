@@ -293,13 +293,22 @@ gt() {
 
 gh() {
   is_in_git_repo || return
-  git log --date=short --format="%C(green)%C(bold)%cd %C(auto)%h%d %s (%an)" \
-    --graph --color=always |
+  local header prompt expect out branch yn msg branchlist
+
+  # --header 'Press CTRL-S to toggle sort'
+  header="Ops:^n:log --name-status,^p:log -p,^r:rename,^w:new"
+  prompt="...   ^o:checkout,^x:delete,alt-m:merge: "
+  expect="ctrl-r,ctrl-w,ctrl-o,ctrl-x,alt-m"
+
+  git log --color=always --graph --date=short \
+    --format="%C(green)%C(bold)%cd %C(auto)%h%d %s (%an)" |
   fzf-down --ansi --no-sort --reverse --multi \
-    --header 'Press CTRL-S to toggle sort' \
+    --header="$header" \
+    --prompt="$prompt" \
+    --expect="$expect" \
     --bind='ctrl-s:toggle-sort' \
-    --preview='grep -o "[a-f0-9]\{7,\}" <<< {} |
-                xargs git show --color=always | head -'$LINES |
+    --preview="grep -o '[a-f0-9]\{7,\}' <<< {} |
+      xargs git show --color=always | head -$LINES" |
   grep -o "[a-f0-9]\{7,\}"
 }
 
