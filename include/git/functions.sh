@@ -200,21 +200,19 @@ gb() {
       --header="$header" \
       --prompt="$prompt" \
       --expect="$expect" \
-      --bind="ctrl-n:execute:
-                _pager git log --color=always --stat \
-                  --name-status \$(sed s'/* //' <<< {})" \
-      --bind="ctrl-p:execute:
-                _pager git log --color=always --stat \
-                  -p \$(sed s'/* //' <<< {})" \
-      --preview='git log --color=always --oneline --graph --date=short \
-                  --pretty="format:%C(auto)%cd %h%d %s" \
-                  $(sed s/^..// <<< {} | cut -d" " -f1) | head -'$LINES |
+      --bind="ctrl-n:execute: _pager git log --color=always --stat \
+        --name-status \$(sed s'/* //' <<< {})" \
+      --bind="ctrl-p:execute: _pager git log --color=always --stat \
+        -p \$(sed s'/* //' <<< {})" \
+      --preview="git log --color=always --oneline --graph --date=short \
+        --pretty='format:%C(auto)%cd %h%d %s' \
+        \$(sed s/^..// <<< {} | cut -d' ' -f1) | head -$LINES" |
     sed 's/^\(alt-.\)/  \1/;s/^\(ctrl-.\)/  \1/' |
       sed 's/^..//' | cut -d' ' -f1
   ))
   k=${out[0]}
   branch=${out[1]}
-  if [ -n "$branch" ]; then
+  if [[ $k == ctrl-* && -n "$branch" ]]; then
     branchlist="\n$(printf '  %s\n' "${out[@]:1}")\n"
     case "$k" in
       ctrl-r)
