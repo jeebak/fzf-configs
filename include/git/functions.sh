@@ -84,8 +84,8 @@ gf() {
 
   local header prompt expect out pane_id file fileslist
 
-  header="Ops:^a:add,^r:revert,^x:rm,^y:amend-no-edit"
-  prompt="...   ^d:diff,^w:word-diff,^h:history: "
+  header="W: ^a:add,^r:revert,^x:rm,^y:amend-no-edit"
+  prompt="  R: ^d:diff,^w:word-diff,^h:history: "
   expect="ctrl-a,ctrl-r,ctrl-x,ctrl-y"
 
   if [[ -n "$TMUX" ]]; then
@@ -190,13 +190,13 @@ gb() {
   is_in_git_repo || return
   local header prompt expect out branch yn msg branchlist
 
-  header="Ops:^n:log --name-status,^p:log -p,^r:rename,^w:new"
-  prompt="...   ^o:checkout,^x:delete,alt-m:merge: "
+  header="W: ^r:rename,^w:new,^o:checkout,^x:delete,alt-m:merge"
+  prompt="  R: ^n:log --name-status,^p:log -p: "
   expect="ctrl-r,ctrl-w,ctrl-o,ctrl-x,alt-m"
 
   out=($(
     git branch -a --color=always | grep -v '/HEAD\s' | sort |
-    fzf-down --ansi --multi --tac \
+    fzf --ansi --multi --tac \
       --header="$header" \
       --prompt="$prompt" \
       --expect="$expect" \
@@ -336,8 +336,8 @@ gs() {
   is_in_git_repo || return
   local header prompt expect yn out k reflog operation
 
-  header="enter:show,^b:branch,^d:diff,^o:pop,^y:apply,^x:drop"
-  prompt="...   ^h:history: "
+  header="W: ^b:branch,^o:pop,^y:apply,^x:drop"
+  prompt="  R: enter:show,^d:diff: "
   expect="ctrl-b,ctrl-o,ctrl-y,ctrl-x"
 
   # Stash, if dirty

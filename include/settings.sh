@@ -9,6 +9,10 @@ FZF_DEFAULT_OPTS="$(
     alt-k:preview-up
     ctrl-f:preview-page-down
     ctrl-b:preview-page-up
+    \?:toggle-preview
+    alt-w:toggle-preview-wrap
+    # Select all
+    alt-a:toggle-all
   )
   # shellcheck disable=SC2178
   bindings="${bindings[*]}"
@@ -26,6 +30,7 @@ FZF_DEFAULT_OPTS="$(
 #   --color info:108,prompt:109,spinner:108,pointer:168,marker:168
 
 # Misc
+    --inline-info # Display finder info inline with the query
     --preview-window='up:70%'
 # I hate meeses to pieces... in fzf
     --no-mouse
