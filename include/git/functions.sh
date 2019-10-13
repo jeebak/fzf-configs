@@ -212,7 +212,7 @@ gb() {
   ))
   k=${out[0]}
   branch=${out[1]}
-  if [[ $k == ctrl-* ]]; then
+  if [[ $k == ctrl-* || $k == alt-* ]]; then
     [[ -z "$branch" ]] && return
     branchlist="\n$(printf '  %s\n' "${out[@]:1}")\n"
     case "$k" in
