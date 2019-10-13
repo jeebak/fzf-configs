@@ -189,7 +189,7 @@ gf() {
 
 gb() {
   is_in_git_repo || return
-  local header prompt expect out branch yn msg branchlist
+  local header prompt expect out branch yn msg branchlist parts
 
   header="W: ^r:rename,^w:new,^o:checkout,^x:delete,alt-m:merge"
   prompt="  R: ^n:log --name-status,^p:log -p: "
@@ -241,7 +241,15 @@ gb() {
       ctrl-x)
         if fzf-git-confirm "Really delete: ${branchlist}?"; then
           for branch in "${out[@]:1}"; do
-            msg="${msg}\n$(reo git branch -D "$branch")"
+            msg="${msg}\n$(
+              if [[ $branch == remotes/* ]]; then
+                IFS='/' read -r -a parts <<< "$branch"
+                branch="${parts[@]:2}" # Branch names with /'s
+                reo git push "${parts[1]}" --delete "${branch// //}"
+              else
+                reo git branch -D "$branch"
+              fi
+            )"
           done
         fi
         ;;

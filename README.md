@@ -98,7 +98,7 @@ CTRL-G CTRL-B for branches
   CTRL-R: git branch   -m <oldbranch>  <newbranch>   # NOTE: <oldbranch>   is the current branch under the cursor
   CTRL-W: git checkout -b <new_branch> <start_point> # NOTE: <start_point> is the current branch under the cursor
   CTRL-O: git checkout ...  # NOTE: this WILL stash first, if dirty
-  CTRL-D: git branch -D ...
+  CTRL-X: git branch -D ... # NOTE: this WILL delete remote references too
   ALT-M:  git merge ...
 
 CTRL-G CTRL-T for tags
