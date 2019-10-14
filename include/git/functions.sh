@@ -393,6 +393,11 @@ gs() {
   prompt="  R: enter:show,^d:diff: "
   expect="alt-b,ctrl-o,ctrl-y,ctrl-x"
 
+  if [[ -n "$TMUX" ]]; then
+    header="$header,^c:b-a-c"
+    expect="$expect,ctrl-c"
+  fi
+
   # Stash, if dirty
   if git diff --quiet || yn=$(
     fzf-git-inputbox "Should I stash this? [y for all|s for some] " \
@@ -447,6 +452,19 @@ gs() {
         ctrl-x)
           if fzf-git-confirm "Really drop this stash?"; then
             msg="$(git stash drop "$reflog")"
+          fi
+          ;;
+        ctrl-c)
+          if fzf-git-confirm "Really branch, add, and commit selected stash?"; then
+            branch="$(fzf-git-inputbox 'Enter a branchname: ')"
+            msg="$(git stash branch "$branch" "$reflog")"
+            # TODO: figure out which files to add vs. stash reflog
+            msg="$(git add "${out[@]:1}")"
+            pane_id=$(tmux split-window -v -P -F "#{pane_id}")
+            # TODO: figure out how to capture into msg
+            tmux send-keys -t "$pane_id" \
+              "git commit; tmux wait-for -S bac-done; exit" \
+                C-m\; wait-for bac-done
           fi
           ;;
       esac

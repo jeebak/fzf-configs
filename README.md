@@ -131,6 +131,8 @@ CTRL-G CTRL-S for stashes # NOTE: this will offer to "en-stash" some or all file
   CTRL-O: git stash pop
   CTRL-Y: git stash apply
   CTRL-X: git stash drop
+  # NOTE: if $TMUX is set, split-window and...
+  CTRL-C: git stash branch <branchname>; git add ...; git commit
 
 CTRL-G CTRL-/ for fzf-git help
 CTRL-G CTRL-D for git diff
