@@ -365,10 +365,22 @@ gs() {
 
   # Stash, if dirty
   if git diff --quiet || yn=$(
-    fzf-git-inputbox "Should I stash this? [y|n] " \
+    fzf-git-inputbox "Should I stash this? [y for all|s for some] " \
       --preview='git diff --color=always'
   ); then
-    [[ $yn == [yY]* ]] && git stash
+    if [[ $yn == [yY]* ]]; then
+      git stash
+    elif [[ $yn == [sS]* ]]; then
+      out=$(
+        git -c color.status=always status --short |
+        fzf -m --ansi \
+          --header="Select files to stash (toggle with [tab] key)" \
+          --preview="git diff --color=always -- {-1} | head -$LINES" |
+        cut -c4- | sed 's/.* -> //'
+      )
+      # shellcheck disable=SC2086
+      [[ -n $out ]] && git stash push $out
+    fi
   fi
   if [[ -s "$(git rev-parse --git-dir)/refs/stash" ]]; then
     out=($(
