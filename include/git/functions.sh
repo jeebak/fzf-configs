@@ -48,7 +48,7 @@ fzf-git-confirm() {
     reo whiptail --yesno --defaultno "$1" 0 0 > /dev/tty
   else
     yn="$(fzf-git-inputbox "$1 [y|n] ")"
-    [[ $yn =~ [yY] ]]
+    [[ $yn == [yY]* ]]
   fi
 
   return $?
@@ -364,7 +364,7 @@ gs() {
     fzf-git-inputbox "Should I stash this? [y|n] " \
       --preview='git diff --color=always'
   ); then
-    [[ $yn =~ [yY] ]] && git stash
+    [[ $yn == [yY]* ]] && git stash
   fi
   if [[ -s "$(git rev-parse --git-dir)/refs/stash" ]]; then
     out=($(
