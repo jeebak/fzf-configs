@@ -349,7 +349,7 @@ gs() {
   # Based on:
   #   https://gist.github.com/junegunn/a563d9e3e07fd721d618562762ec619d
   is_in_git_repo || return
-  local header prompt expect yn out k reflog operation
+  local header prompt expect yn msg out k reflog branch
 
   header="W: ^b:branch,^o:pop,^y:apply,^x:drop"
   prompt="  R: enter:show,^d:diff: "
@@ -361,7 +361,7 @@ gs() {
       --preview='git diff --color=always'
   ); then
     if [[ $yn == [yY]* ]]; then
-      git stash
+      msg="$(git stash)"
     elif [[ $yn == [sS]* ]]; then
       out=$(
         git -c color.status=always status --short |
@@ -371,8 +371,9 @@ gs() {
         cut -c4- | sed 's/.* -> //'
       )
       # shellcheck disable=SC2086
-      [[ -n $out ]] && git stash push $out
+      [[ -n $out ]] && msg="$(git stash push $out)"
     fi
+    [[ -n "$msg" ]] && echo -e "$msg" | _pager
   fi
   if [[ -s "$(git rev-parse --git-dir)/refs/stash" ]]; then
     out=($(
@@ -395,16 +396,22 @@ gs() {
     if [ -n "$reflog" ]; then
       case "$k" in
         ctrl-b)
-          git stash branch "$(
-            fzf-git-inputbox 'Enter a branchname: '
-          )" "$reflog"
-          return
+          branch="$(fzf-git-inputbox 'Enter a branchname: ')"
+          msg="$(git stash branch "$branch" "$reflog")"
           ;;
-        ctrl-o) operation=pop;;
-        ctrl-y) operation=apply;;
-        ctrl-x) operation=drop;;
+        ctrl-o)
+          msg="$(git stash pop "$reflog")"
+          ;;
+        ctrl-y)
+          msg="$(git stash apply "$reflog")"
+          ;;
+        ctrl-x)
+          if fzf-git-confirm "Really drop this stash?"; then
+            msg="$(git stash drop "$reflog")"
+          fi
+          ;;
       esac
-      git stash "$operation" "$reflog"
+      [[ -n "$msg" ]] && echo -e "$msg" | _pager
     fi
   else
     echo -n "$(tput bold)$(tput setaf 7)No stashes found!$(tput sgr0)"
