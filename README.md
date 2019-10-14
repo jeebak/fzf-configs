@@ -67,7 +67,52 @@ and add something like:
 
 This file **has** to contain something that uses `$fzf` and sets `$matches`.
 
-## fzf-git
+## Prefix
+```
+# cchars: discard = ^O; dsusp = ^Y; eof = ^D; eol = <undef>;
+# eol2 = <undef>; erase = ^?; intr = ^C; kill = ^U; lnext = ^V;
+# min = 1; quit = ^\; reprint = ^R; start = ^Q; status = ^T;
+# stop = ^S; susp = ^Z; time = 0; werase = ^W;
+
+# '^q' cd
+# '^w' backward-kill-word
+# '^e' end-of-line
+# '^r' fzf-history-widget
+# '^t' fzf-file-widget
+# '^y' dsusp
+# '^u' kill-whole-line
+# '^i' fzf-completion
+# '^o' fzf-edit-file
+# '^p' history-substring-search-up
+# '^[' escape
+# '^]' AVAILABLE
+# '^\' N/A
+
+# '^a' beginning-of-line
+# '^s' stop / emoji::cli
+# '^d' eof  / __dotmatrix::bash-ctrl-d
+# '^f' forward-char
+# '^g' fzf-git prefix
+# '^h' backward-delete-char
+# '^j' accept-line
+# '^k' kill-line
+# '^l' clear-screen
+# '^;' N/A
+# '^'' N/A
+
+# '^z' susp / __dotmatrix::fancy-ctrl-z
+# '^x' prefix for vi cmds
+# '^c' intr
+# '^v' quoted-insert
+# '^b' backward-char
+# '^n' history-substring-search-down
+# '^m' accept-line
+# '^,' N/A
+# '^.' N/A
+# '^_' AVAILABLE
+```
+
+### fzf-git
 - https://junegunn.kr/2016/07/fzf-git/
   - https://gist.github.com/junegunn/8b572b8d4b5eddd8b85e5f4d40f17236
 - https://github.com/zulu-zsh/plugin-fzf-git
