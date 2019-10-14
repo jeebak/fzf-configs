@@ -45,7 +45,7 @@ fzf-git-confirm() {
   local yn
 
   if qt command -v whiptail; then
-    reo whiptail --yesno --defaultno "$1" 0 0 > /dev/tty
+    whiptail --yesno --defaultno "$1" 0 0 > /dev/tty
   else
     yn="$(fzf-git-inputbox "$1 [y|n] ")"
     [[ $yn == [yY]* ]]
@@ -251,16 +251,18 @@ gb() {
       ctrl-x)
         if fzf-git-confirm "Really delete: ${branchlist}?"; then
           for branch in "${out[@]:1}"; do
-            msg="${msg}\n$(
-              if [[ $branch == remotes/* ]]; then
-                IFS='/' read -r -a parts <<< "$branch"
-                # shellcheck disable=SC2030,2124
-                branch="${parts[@]:2}" # Branch names with /'s
+            if [[ $branch == remotes/* ]]; then
+              IFS='/' read -r -a parts <<< "$branch"
+              # shellcheck disable=SC2030,2124
+              branch="${parts[@]:2}" # Branch names with /'s
+              msg="${msg}\n$(
                 reo git push "${parts[1]}" --delete "${branch// //}"
-              else
+              )"
+            else
+              msg="${msg}\n$(
                 reo git branch -D "$branch"
-              fi
-            )"
+              )"
+            fi
           done
         fi
         ;;
