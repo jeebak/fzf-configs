@@ -192,7 +192,7 @@ gb() {
   local header prompt expect out branch yn msg branchlist parts
 
   header="W: ^r:rename,^w:new,^o:checkout,^x:delete,alt-m:merge"
-  prompt="  R: ^n:log --name-status,^p:log -p: "
+  prompt="  R: ^d:diff,^n:log --name-status,^p:log -p: "
   expect="ctrl-r,ctrl-w,ctrl-o,ctrl-x,alt-m"
 
   out=($(
@@ -201,6 +201,8 @@ gb() {
       --header="$header" \
       --prompt="$prompt" \
       --expect="$expect" \
+      --bind="ctrl-d:execute: _pager git diff --color=always --stat \
+        -p \$(sed s'/* //' <<< {})" \
       --bind="ctrl-n:execute: _pager git log --color=always --stat \
         --name-status \$(sed s'/* //' <<< {})" \
       --bind="ctrl-p:execute: _pager git log --color=always --stat \
@@ -244,6 +246,7 @@ gb() {
             msg="${msg}\n$(
               if [[ $branch == remotes/* ]]; then
                 IFS='/' read -r -a parts <<< "$branch"
+                # shellcheck disable=SC2030,2124
                 branch="${parts[@]:2}" # Branch names with /'s
                 reo git push "${parts[1]}" --delete "${branch// //}"
               else
@@ -254,6 +257,7 @@ gb() {
         fi
         ;;
       alt-m)
+        # shellcheck disable=SC2031
         if fzf-git-confirm "Really merge: ${branch}?"; then
           msg="${msg}\n$(reo git merge --stat "$branch")"
         fi
@@ -271,7 +275,7 @@ gt() {
   is_in_git_repo || return
   git tag --sort -version:refname |
   fzf-down --multi \
-    --preview='git show --color=always {} | head -'$LINES
+    --preview="git show --color=always {} | head -$LINES"
 }
 
 gh() {
