@@ -107,6 +107,7 @@ CTRL-G CTRL-B for branches
 
 CTRL-G CTRL-T for tags
 CTRL-G CTRL-R for remotes
+  CTRL-P:  git remote prune ...
 
 CTRL-G CTRL-H for commit hashes
 CTRL-G h        ""
