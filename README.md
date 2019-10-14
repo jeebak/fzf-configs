@@ -93,7 +93,9 @@ CTRL-G CTRL-F for files
   CTRL-P: git add -p ...
 
 CTRL-G CTRL-B for branches
+  CTRL-S: git log  -p ..<selected_branch>
   CTRL-D: git diff -p <selected_branch> # current branch
+  CTRL-F: git log  -p <selected_branch>..
   CTRL-N: git log --name-status
   CTRL-P: git log -p
   CTRL-R: git branch   -m <oldbranch>  <newbranch>   # NOTE: <oldbranch>   is the current branch under the cursor

@@ -192,7 +192,7 @@ gb() {
   local header prompt expect out branch yn msg branchlist parts
 
   header="W: ^r:rename,^w:new,^o:checkout,^x:delete,alt-m:merge"
-  prompt="  R: ^d:diff,^n:log --name-status,^p:log -p: "
+  prompt="  R: ^s:log ..b,^d:diff,^f:log b..,^n:log --n-s,^p:log -p: "
   expect="ctrl-r,ctrl-w,ctrl-o,ctrl-x,alt-m"
 
   out=($(
@@ -201,8 +201,12 @@ gb() {
       --header="$header" \
       --prompt="$prompt" \
       --expect="$expect" \
+      --bind="ctrl-s:execute: _pager git log --color=always --stat \
+        -p ..\$(sed s'/* //' <<< {1})" \
       --bind="ctrl-d:execute: _pager git diff --color=always --stat \
-        -p \$(sed s'/* //' <<< {})" \
+        -p \$(sed s'/* //' <<< {1})" \
+      --bind="ctrl-f:execute: _pager git log --color=always --stat \
+        -p \$(sed s'/* //' <<< {1}).." \
       --bind="ctrl-n:execute: _pager git log --color=always --stat \
         --name-status \$(sed s'/* //' <<< {})" \
       --bind="ctrl-p:execute: _pager git log --color=always --stat \
