@@ -85,9 +85,9 @@ gf() {
 
   local header prompt expect out pane_id file fileslist
 
-  header="W: ^a:add,^r:revert,^x:rm,^y:amend-no-edit"
+  header="W: ^a:add,^r:revert,^s:stash,^x:rm,^y:amend-no-edit"
   prompt="  R: ^d:diff,^w:word-diff,^h:history: "
-  expect="ctrl-a,ctrl-r,ctrl-x,ctrl-y"
+  expect="ctrl-a,ctrl-r,ctrl-s,ctrl-x,ctrl-y"
 
   if [[ -n "$TMUX" ]]; then
     header="$header,^u:amend,^e:edit,^o:commit,^p:add -p"
@@ -127,6 +127,10 @@ gf() {
           done
           _pager git status
         fi
+        ;;
+      ctrl-s)
+        qt git stash push "${out[@]:1}"
+        _pager git stash show --color=always --stat
         ;;
       ctrl-x)
         if fzf-git-confirm "Really rm: ${fileslist}?"; then
