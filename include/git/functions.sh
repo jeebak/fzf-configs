@@ -323,36 +323,26 @@ gl() {
   is_in_git_repo || return
   local prompt
 
-  prompt="^d:diff,^l:log -p,^n:show --name-status,^w:word-diff,<enter>:show: "
+  prompt="  R: ^d:diff,^w:show word-diff,<enter>:show: "
+
   # http://junegunn.kr/2015/03/browsing-git-commits-with-fzf/
   #   Based on: https://gist.github.com/junegunn/f4fca918e937e6bf5bad
   # fshow - git commit browser (enter for show, ctrl-d for diff, ` toggles sort)
   git log --graph --color=always \
-          --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
+    --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
   fzf --ansi --no-sort --reverse --tiebreak=index --toggle-sort=\` \
       --prompt="$prompt" \
-      --bind="ctrl-d:execute:
-                printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % bash -c 'git diff --color=always --stat -p % |
-                _pager'" \
-      --bind="ctrl-l:execute:
-                printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % bash -c 'git log --color=always -p %.. |
-                _pager'" \
-      --bind="ctrl-n:execute:
-                printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % bash -c 'git show --color=always --name-status %.. |
-                _pager'" \
-      --bind="ctrl-w:execute:
-                printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % bash -c 'git show --color=always -w --word-diff % |
-                _pager'" \
-      --bind="ctrl-m:execute:
-                printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % bash -c 'git show --color=always % |
-                _pager'" \
-      --preview="printf %q {} | grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % bash -c 'git diff --color=always %'"
+      --bind="ctrl-d:execute:echo {} | grep -Eo '[a-f0-9]+' | head -1 |
+        xargs -I % bash -c 'git diff --color=always -p % |
+        _pager'" \
+      --bind="ctrl-w:execute:echo {} | grep -Eo '[a-f0-9]+' | head -1 |
+        xargs -I % bash -c 'git show --color=always -w --word-diff % |
+        _pager'" \
+      --bind="ctrl-m:execute:echo {} | grep -Eo '[a-f0-9]+' | head -1 |
+        xargs -I % bash -c 'git show --color=always % |
+        _pager'" \
+      --preview="echo {} | grep -Eo '[a-f0-9]+' | head -1 |
+        xargs -I% git show --color=always --stat -p %"
 }
 
 gs() {
