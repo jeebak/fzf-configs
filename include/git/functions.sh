@@ -304,7 +304,7 @@ gr() {
   is_in_git_repo || return
   local header prompt expect out remote yn msg remoteslist r
 
-  header="W: ^f:fetch,^p:pull,alt-p:prune"
+  header="W: ^x:remove,^f:fetch,^p:pull,alt-p:prune"
   expect="alt-p"
 
   out=($(
@@ -312,6 +312,7 @@ gr() {
     fzf-down --tac \
       --header="$header" \
       --expect="$expect" \
+      --bind="ctrl-x:execute: _pager git remote remove {1}" \
       --bind="ctrl-f:execute: _pager git fetch {1}" \
       --bind="ctrl-p:execute: _pager git pull {1}" \
       --preview="
