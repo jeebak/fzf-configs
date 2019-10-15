@@ -96,7 +96,7 @@ if command -v zle > /dev/null; then
 
   # Based on: fzf-completion
   _fzf-configs-completion() {
-    local tokens cmd fzf matches
+    local tokens cmd fzf matches query
     setopt localoptions noshwordsplit noksh_arrays noposixbuiltins
 
     # shellcheck disable=SC2206
@@ -108,15 +108,15 @@ if command -v zle > /dev/null; then
 
     cmd=${tokens[1]}
 
-    if [[ -f "$HOME/.config/fzf-configs/completions/${cmd}.zsh" ]] &&
-       [[ ${LBUFFER[-1]} = ' ' ]]; then
+    if [[ -f "$HOME/.config/fzf-configs/completions/${cmd}.zsh" ]]; then
+      [[ ${#tokens} -gt 1 ]] && query=${tokens[-1]}
       # shellcheck disable=SC2034
       fzf="$(__fzfcmd_complete)"
       # shellcheck disable=SC1090
       source "$HOME/.config/fzf-configs/completions/${cmd}.zsh"
       # See README.md for more info on how to use this.
       if [ -n "$matches" ]; then
-        LBUFFER="$LBUFFER$matches"
+        LBUFFER="${LBUFFER%$query}$matches"
       fi
       zle reset-prompt
     else

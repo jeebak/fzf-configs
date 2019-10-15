@@ -54,12 +54,14 @@ for a custom script named `doge`, create a file named:
 and add something like:
 
 ```
+ # keep "$query" pristine, use "$q" to form --query arg
+ [[ -n $query ]] && q="--query=$query"
  matches=$(
    echo "
      option-1
      option-2
      option-3
-   " | sed 's/#.*//;s/  */ /g;/^ *$/d' | ${fzf}
+   " | sed 's/#.*//;s/  */ /g;/^ *$/d' | ${fzf} $q
  )
 ```
 
