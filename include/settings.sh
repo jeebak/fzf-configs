@@ -99,6 +99,7 @@ if command -v zle > /dev/null; then
     local tokens cmd fzf matches
     setopt localoptions noshwordsplit noksh_arrays noposixbuiltins
 
+    # shellcheck disable=SC2206
     tokens=(${(z)LBUFFER})
     if [ ${#tokens} -lt 1 ]; then
       zle expand-or-complete

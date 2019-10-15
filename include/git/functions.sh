@@ -94,6 +94,7 @@ gf() {
     expect="$expect,ctrl-u,ctrl-e,ctrl-o,ctrl-p"
   fi
 
+  # shellcheck disable=SC2207
   while out=($(
     git -c color.status=always status --short |
     fzf -m --ansi --nth 2..,.. \
@@ -199,6 +200,7 @@ gb() {
   prompt="  R: ^s:log ..b,^d:diff,^f:log b..,^n:log --n-s,^p:log -p: "
   expect="ctrl-r,ctrl-w,ctrl-o,ctrl-x,alt-m"
 
+  # shellcheck disable=SC2207
   out=($(
     git branch -a --color=always | grep -v '/HEAD\s' | sort |
     fzf --ansi --multi --tac \
@@ -241,6 +243,7 @@ gb() {
         ;;
       ctrl-o)
         msg="$(reo git stash)"
+        # shellcheck disable=SC2001
         branch="$(sed 's#^remotes/[^/][^/]*/##' <<< "$branch")"
         if git show-ref --verify --quiet "refs/heads/$branch"; then
           msg="${msg}\n\n$(reo git checkout    "$branch")"
@@ -307,6 +310,7 @@ gr() {
   header="W: ^x:remove,^f:fetch,^p:pull,alt-p:prune"
   expect="alt-p"
 
+  # shellcheck disable=SC2207
   out=($(
     git remote -v | awk '{print $1 "\t" $2}' | uniq |
     fzf-down --tac \
@@ -410,6 +414,7 @@ gs() {
     [[ -n "$msg" ]] && echo -e "$msg" | _pager
   fi
   if [[ -s "$(git rev-parse --git-dir)/refs/stash" ]]; then
+    # shellcheck disable=SC2207
     out=($(
       git stash list --pretty='%C(yellow)%gd %>(14)%Cgreen%cr %C(blue)%gs' |
       fzf --ansi --no-sort --border --reverse \
@@ -454,6 +459,7 @@ gs() {
 
 edit-modified() {
   is_in_git_repo || { echo "Not in a git repo." && exit 1; }
+  # shellcheck disable=SC2207
   local files=(
     $(command git status -s | sed -ne 's/^ *MM* //p')
   )
