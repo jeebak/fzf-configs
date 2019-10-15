@@ -304,14 +304,16 @@ gr() {
   is_in_git_repo || return
   local header prompt expect out remote yn msg remoteslist r
 
-  header="W: ^p:prune"
-  expect="ctrl-p"
+  header="W: ^f:fetch,^p:pull,alt-p:prune"
+  expect="alt-p"
 
   out=($(
     git remote -v | awk '{print $1 "\t" $2}' | uniq |
     fzf-down --tac \
       --header="$header" \
       --expect="$expect" \
+      --bind="ctrl-f:execute: _pager git fetch {1}" \
+      --bind="ctrl-p:execute: _pager git pull {1}" \
       --preview="
         git log --oneline --graph --date=short --pretty='format:%C(auto)%cd %h%d %s' {1} |
         head -$LINES
@@ -324,7 +326,7 @@ gr() {
     [[ -z "$remote" ]] && return
     remoteslist="\n$(printf '  %s\n' "${out[@]:1}")\n"
     case "$k" in
-      ctrl-p)
+      alt-p)
         # shellcheck disable=SC2031
         if fzf-git-confirm "Really prune: ${remoteslist}?"; then
           for r in "${out[@]:1}"; do
