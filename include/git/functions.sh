@@ -389,9 +389,9 @@ gs() {
   is_in_git_repo || return
   local header prompt expect yn msg out k reflog branch
 
-  header="W: ^b:branch,^o:pop,^y:apply,^x:drop"
+  header="W: alt-b:branch,^o:pop,^y:apply,^x:drop"
   prompt="  R: enter:show,^d:diff: "
-  expect="ctrl-b,ctrl-o,ctrl-y,ctrl-x"
+  expect="alt-b,ctrl-o,ctrl-y,ctrl-x"
 
   # Stash, if dirty
   if git diff --quiet || yn=$(
@@ -434,7 +434,7 @@ gs() {
     reflog=${out[1]}
     if [ -n "$reflog" ]; then
       case "$k" in
-        ctrl-b)
+        alt-b)
           branch="$(fzf-git-inputbox 'Enter a branchname: ')"
           msg="$(git stash branch "$branch" "$reflog")"
           ;;

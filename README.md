@@ -127,7 +127,7 @@ CTRL-G L        ""
   Enter:  git show ...
 
 CTRL-G CTRL-S for stashes # NOTE: this will offer to "en-stash" some or all files when invoked
-  CTRL-B: git stash branch <branchname>
+  ALT-B:  git stash branch <branchname>
   CTRL-O: git stash pop
   CTRL-Y: git stash apply
   CTRL-X: git stash drop
