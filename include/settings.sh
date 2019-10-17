@@ -13,6 +13,8 @@ FZF_DEFAULT_OPTS="$(
     alt-w:toggle-preview-wrap
     # Select all
     alt-a:toggle-all
+    # This is for safety, but can be overridden w/ --bind="ctrl-z:..." option
+    ctrl-z:clear-screen
   )
   # shellcheck disable=SC2178
   bindings="${bindings[*]}"
