@@ -47,15 +47,10 @@ export FZF_DEFAULT_OPTS
 # export FZF_CTRL_T_COMMAND='git ls-files'
 
 # Try bat, highlight, coderay, rougify in turn, then fall back to cat
-export FZF_CTRL_T_OPTS="\
-  --bind 'ctrl-o:execute(less {} > /dev/tty)' \
-  --preview '[[ \$(file --mime {}) =~ binary ]] \
-      && ([[ -d {} ]] && exa --color=always -Ta {} || tree -Ca {} || echo Binary: {}) 2> /dev/null \
-      || (bat --style=changes,grid,numbers --color=always {} \
-      || highlight -O ansi -l {} \
-      || coderay {} \
-      || rougify {} \
-      || cat {}) 2> /dev/null | head -1000'"
+export FZF_CTRL_T_OPTS="
+  --bind 'ctrl-o:execute(less {} > /dev/tty)'
+  --preview 'fzf-preview {} 1000'
+"
 
 # CTRL-R - Paste the selected command from history onto the command-line
 #   If you want to see the commands in chronological order, press CTRL-R again
@@ -64,9 +59,12 @@ export FZF_CTRL_T_OPTS="\
 # ALT-C - cd into the selected directory
 #   Set FZF_ALT_C_COMMAND to override the default command
 #   Set FZF_ALT_C_OPTS to pass additional options
-export FZF_ALT_C_OPTS="\
-  --bind 'ctrl-o:execute(less {} > /dev/tty)' \
-  --preview '(exa --color=always -Ta {} || tree -Ca {}) 2> /dev/null | head -1000'"
+export FZF_ALT_C_OPTS="
+  --bind 'ctrl-o:execute(less {} > /dev/tty)'
+  --preview 'fzf-preview {} 1000'
+"
+
+export FZF_TMUX_HEIGHT='70%'
 
 # If you're on a tmux session, you can start fzf in a split pane by setting
 #   FZF_TMUX to 1, and change the height of the pane with

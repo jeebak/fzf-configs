@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+if [[ -d "$1" ]]; then
+  ( exa --color=always -Ta "$1" ||
+    tree -Ca "$1"
+  ) 2> /dev/null | head -"$2"
+elif [[ $(file --mime "$1") =~ binary ]]; then
+  echo Binary: "$1"
+else
+  ( bat --style=changes,grid,numbers --color=always "$1" ||
+    highlight -O ansi -l "$1" ||
+    coderay "$1" ||
+    rougify "$1" ||
+    cat "$1"
+  ) 2> /dev/null | head -"$2"
+fi
