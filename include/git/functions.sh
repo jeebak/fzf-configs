@@ -86,7 +86,7 @@ gf() {
   local header prompt expect out pane_id file fileslist
 
   header="W: ^a:add,^r:revert,^s:stash,^x:rm,^y:amend-no-edit"
-  prompt="  R: ^d:diff,^w:word-diff,^h:history: "
+  prompt="  R: ^d:diff,^w:word-diff,^h:history {},^n:log --n-s,^l:log -p: "
   expect="ctrl-a,ctrl-r,ctrl-s,ctrl-x,ctrl-y"
 
   if [[ -n "$TMUX" ]]; then
@@ -107,6 +107,10 @@ gf() {
         -w --word-diff -- '{-1}'" \
       --bind="ctrl-h:execute: _pager git log  --color=always \
         -p '{-1}'" \
+      --bind="ctrl-n:execute: _pager git log  --color=always \
+        --name-status" \
+      --bind="ctrl-l:execute: _pager git log  --color=always \
+        -p" \
       --preview="(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) |
         head -$LINES" |
     sed 's/^\(ctrl-.\)/    \1/' | cut -c4- | sed 's/.* -> //'
