@@ -41,7 +41,7 @@ fzf-edit-file() {
       find . -path "*/\.*" -prune -o -type f -print -o -type l -print |
         sed s/^..//
     ) 2> /dev/null |
-    FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --tiebreak=index $FZF_CTRL_T_OPTS --preview-window up:40%" fzf
+    FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --tiebreak=index $FZF_CTRL_T_OPTS --preview-window up:70%" fzf
   )"
 
   [[ -n "$out" ]] && LBUFFER="${EDITOR:-vim} \"$out\""
