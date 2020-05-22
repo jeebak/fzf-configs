@@ -6,9 +6,10 @@ if ! command -v fzf  > /dev/null; then
     # To install useful key bindings and fuzzy completion:
     "$(brew --prefix)/opt/fzf/install"
   else
-    [[ -d "$HOME/.fzf" ]] ||
+    [[ -d "$HOME/.fzf/.git" ]] || {
       git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf"
-    [[ -x "$HOME/.fzf/install" ]] && "$HOME/.fzf/install"
+      [[ -x "$HOME/.fzf/install" ]] && "$HOME/.fzf/install"
+    }
   fi
 fi
 
