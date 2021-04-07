@@ -83,11 +83,11 @@ gf() {
     return
   fi
 
-  local header prompt expect out pane_id file fileslist
+  local header prompt expect out pane_id file fileslist joined
 
-  header="W: ^a:add,^r:revert,^s:stash,^x:rm,^y:amend-no-edit"
+  header="W: ^a:add,^r:revert,^s:stash,^x:rm,^t:wip,^y:amend-no-edit"
   prompt="  R: ^d:diff,^w:word-diff,^h:history {},^n:log --n-s,^l:log -p: "
-  expect="ctrl-a,ctrl-r,ctrl-s,ctrl-x,ctrl-y"
+  expect="ctrl-a,ctrl-r,ctrl-s,ctrl-x,ctrl-t,ctrl-y"
 
   if [[ -n "$TMUX" ]]; then
     header="$header,^u:amend,^e:edit,^o:commit,^p:add -p"
@@ -148,6 +148,12 @@ gf() {
             fi
           done
           _pager git status
+        fi
+        ;;
+      ctrl-t)
+        if fzf-git-confirm "Really add and commit as \"[WIP] ...\": ${fileslist}?"; then
+          printf -v joined "%s, " "${out[@]:1}"
+          qt git commit -m "[WIP] ${joined%, }" "${out[@]:1}"
         fi
         ;;
       ctrl-y)
