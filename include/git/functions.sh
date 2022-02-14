@@ -85,8 +85,8 @@ gf() {
 
   local header prompt expect out pane_id file fileslist joined
 
-  header="W: ^a:add,^r:revert,^s:stash,^x:rm,^t:wip,^y:amend-no-edit"
-  prompt="  R: ^d:diff,^w:word-diff,^h:history {},^n:log --n-s,^l:log -p: "
+  header="📝: ^a:add,^r:revert,^s:stash,^x:rm,^t:wip,^y:amend-no-edit"
+  prompt="  👀: ^d:diff,^w:word-diff,^h:history {},^n:log --n-s,^l:log -p: "
   expect="ctrl-a,ctrl-r,ctrl-s,ctrl-x,ctrl-t,ctrl-y"
 
   if [[ -n "$TMUX" ]]; then
@@ -206,8 +206,8 @@ gb() {
   is_in_git_repo || return
   local header prompt expect out branch yn msg branchlist parts
 
-  header="W: ^r:rename,^w:new,^o:checkout,^x:delete,alt-m:merge"
-  prompt="  R: ^s:log ..b,^d:diff,^f:log b..,^n:log --n-s,^p:log -p: "
+  header="📝: ^r:rename,^w:new,^o:checkout,^x:delete,alt-m:merge"
+  prompt="  👀: ^s:log ..b,^d:diff,^f:log b..,^n:log --n-s,^p:log -p: "
   expect="ctrl-r,ctrl-w,ctrl-o,ctrl-x,alt-m"
 
   # shellcheck disable=SC2207
@@ -317,7 +317,7 @@ gr() {
   is_in_git_repo || return
   local header prompt expect out remote yn msg remoteslist r
 
-  header="W: ^x:remove,^f:fetch,^p:pull,alt-p:prune"
+  header="📝: ^x:remove,^f:fetch,^p:pull,alt-p:prune"
   expect="alt-p"
 
   # shellcheck disable=SC2207
@@ -371,7 +371,7 @@ gl() {
   is_in_git_repo || return
   local prompt
 
-  prompt="  R: ^d:diff,^w:show word-diff,<enter>:show: "
+  prompt="  👀: ^d:diff,^w:show word-diff,<enter>:show: "
 
   # http://junegunn.kr/2015/03/browsing-git-commits-with-fzf/
   #   Based on: https://gist.github.com/junegunn/f4fca918e937e6bf5bad
@@ -399,8 +399,8 @@ gs() {
   is_in_git_repo || return
   local header prompt expect yn msg out k reflog branch
 
-  header="W: alt-b:branch,^o:pop,^y:apply,^x:drop"
-  prompt="  R: enter:show,^d:diff: "
+  header="📝: alt-b:branch,^o:pop,^y:apply,^x:drop"
+  prompt="  👀: enter:show,^d:diff: "
   expect="alt-b,ctrl-o,ctrl-y,ctrl-x"
 
   # Stash, if dirty
