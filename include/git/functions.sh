@@ -86,7 +86,7 @@ gf() {
   local header prompt expect out pane_id file fileslist joined
 
   header="📝: ^a:add,^r:revert,^s:stash,^x:rm,^t:wip,^y:amend-no-edit"
-  prompt="  👀: ^d:diff,^w:word-diff,^h:history {},^n:log --n-s,^l:log -p: "
+  prompt="  👀: ^d:diff,^w:word-diff,^h:history {},^n:log --n-s,^l:log -p:alt-t:toggle-all: "
   expect="ctrl-a,ctrl-r,ctrl-s,ctrl-x,ctrl-t,ctrl-y"
 
   if [[ -n "$TMUX" ]]; then
@@ -101,6 +101,7 @@ gf() {
       --header="$header" \
       --prompt="$prompt" \
       --expect="$expect" \
+      --bind="alt-t:toggle-all" \
       --bind="ctrl-d:execute: _pager git diff --color=always \
         --stat -p -- '{-1}'" \
       --bind="ctrl-w:execute: _pager git diff --color=always \
