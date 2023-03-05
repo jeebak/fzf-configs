@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC2178
 
 export PATH="${PLUGIN_D}/bin:${PATH}"
 
@@ -16,7 +17,6 @@ FZF_DEFAULT_OPTS="$(
     # This is for safety, but can be overridden w/ --bind="ctrl-z:..." option
     ctrl-z:clear-screen
   )
-  # shellcheck disable=SC2178
   bindings="${bindings[*]}"
 
   echo "
