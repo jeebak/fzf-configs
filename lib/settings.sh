@@ -49,7 +49,7 @@ export FZF_DEFAULT_OPTS
 # Try bat, highlight, coderay, rougify in turn, then fall back to cat
 export FZF_CTRL_T_OPTS="
   --bind 'ctrl-o:execute(less {} > /dev/tty)'
-  --preview 'fzf-preview {} 1000'
+  --preview '$PLUGIN_D/libexec/preview {} 1000'
 "
 
 # CTRL-R - Paste the selected command from history onto the command-line
@@ -61,7 +61,7 @@ export FZF_CTRL_T_OPTS="
 #   Set FZF_ALT_C_OPTS to pass additional options
 export FZF_ALT_C_OPTS="
   --bind 'ctrl-o:execute(less {} > /dev/tty)'
-  --preview 'fzf-preview {} 1000'
+  --preview '$PLUGIN_D/libexec/preview {} 1000'
 "
 
 export FZF_TMUX_HEIGHT='70%'
