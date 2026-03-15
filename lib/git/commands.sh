@@ -1,22 +1,10 @@
 #!/usr/bin/env bash
+# shellcheck disable=SC1090
 
 # GIT heart FZF
 # -------------
 
-# Quiet everything
-qt() {
-  "$@" > /dev/null 2>&1
-}
-
-# Quiet stderr
-qte() {
-  "$@" 2> /dev/null
-}
-
-# Redirect error to out
-reo() {
-  "$@" 2>&1
-}
+source "$PLUGIN_D/lib/utils.sh"
 
 _pager() {
   if [[ $# -eq 0 ]]; then
