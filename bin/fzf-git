@@ -3,7 +3,7 @@
 PLUGIN_D="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
 # -----------------------------------------------------------------------------
 # shellcheck disable=SC1090
-source "$PLUGIN_D/lib/git/functions.sh"
+source "$PLUGIN_D/lib/git/commands.sh"
 # -----------------------------------------------------------------------------
 if [[ "${BASH_SOURCE[0]}" = "${0}" ]]; then
   subcommand="$1"
