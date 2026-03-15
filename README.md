@@ -45,7 +45,7 @@ Automatically [installs fzf](https://github.com/junegunn/fzf#installation) if
 
 ## Simple Completion for Custom commands/scripts (`zsh` only)
 
-The `include/settings.sh` file contains `_fzf-configs-completion()` that we're
+The `lib/settings.sh` file contains `_fzf-configs-completion()` that we're
 using for `fzf_default_completion`. For example, to add your own completions
 for a custom script named `doge`, create a file named:
 
