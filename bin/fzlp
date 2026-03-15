@@ -6,28 +6,15 @@
 
 export LPASS_AGENT_TIMEOUT=0
 
+PLUGIN_D="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
+# shellcheck disable=SC1091
+source "$PLUGIN_D/lib/utils.sh"
+
 self="${0##/*/}"
 destdir="$(grep -E -o '[^/]+/[^/]*$' <<< "${0%/bin/$self}")"
 confdir="${XDG_CONFIG_HOME:-$HOME/.config}/$destdir/creds/lastpass"
 
 readonly LP_USERNAME_FILE="$confdir/username.txt"
-
-function cmd_exists() {
-  command -v "$1" > /dev/null 2>&1
-}
-
-function errcho() {
-  # echo to strerr
-  >&2 echo "$@"
-}
-
-function die() {
-  local exit_code
-
-  [[ -z "$2" ]] && exit_code=1 || exit_code="$2"
-  errcho "$1"
-  exit "$exit_code"
-}
 
 function set_email() {
   local email
