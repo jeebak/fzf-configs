@@ -1,6 +1,22 @@
-# WIP
-
 # fzf-configs
+
+A shell plugin that configures [fzf](https://github.com/junegunn/fzf) with git-aware keybindings and fuzzy utilities for both zsh and bash.
+
+## Dependencies
+
+**Auto-installed:** [`fzf`](https://github.com/junegunn/fzf) (via `brew` or `git clone`), [`whiptail`](https://linux.die.net/man/1/whiptail) (via `brew`)
+
+**Optional — enhanced experience:**
+- [`bat`](https://github.com/sharkdp/bat) — syntax-highlighted file previews
+- [`lsd`](https://github.com/lsd-rs/lsd) — directory tree previews (falls back to `tree`)
+- [`fd`](https://github.com/sharkdp/fd) — faster path/directory completion
+- [`ghq`](https://github.com/x-motemen/ghq) — repo switcher (`ESC-s`, zsh only)
+
+**Required by bin scripts:**
+- `fzlp` — [`lpass`](https://github.com/lastpass/lastpass-cli)
+- `fzbw` — [`bw`](https://bitwarden.com/help/cli/), [`jq`](https://jqlang.github.io/jq/)
+- `fz1p` — [`op`](https://developer.1password.com/docs/cli/), [`jq`](https://jqlang.github.io/jq/)
+- Clipboard (for `fzlp`, `fzbw`, `fz1p`): OSC52 is used unconditionally (works locally and over SSH); native tools used as additional fallbacks: `pbcopy` (macOS), `wl-copy` (Wayland), `xclip`/`xsel` (X11), `clip.exe` (Cygwin/MSYS), `win32yank`, `termux-clipboard-set`, `lemonade`, `doitclient`
 
 ## Installation
 
@@ -16,13 +32,18 @@ zplug jeebak/fzf-configs
 
 #### Using [zgen](https://github.com/tarjoilija/zgen)
 ```shell
-zgen jeebak/fzf-configs
+zgen load jeebak/fzf-configs
 zgen save
 ```
-etc. etc.
+
+#### Using [zgenom](https://github.com/jandamm/zgenom)
+```shell
+zgenom load jeebak/fzf-configs
+zgenom save
+```
 
 #### Manually
-```
+```shell
 git clone --depth 1 https://github.com/jeebak/fzf-configs ~/some/path/fzf-configs
 echo "source ~/some/path/fzf-configs/fzf-configs.plugin.zsh" >> ~/.zshrc
 ```
@@ -33,110 +54,131 @@ echo "source ~/some/path/fzf-configs/fzf-configs.plugin.zsh" >> ~/.zshrc
   <summary>Bash</summary>
 
 #### Manually
-```
+```shell
 git clone --depth 1 https://github.com/jeebak/fzf-configs ~/some/path/fzf-configs
 echo "source ~/some/path/fzf-configs/fzf-configs.plugin.bash" >> ~/.bashrc
 ```
 
 </details>
 
-Automatically [installs fzf](https://github.com/junegunn/fzf#installation) if
-`brew` (or `git`) is available.
+Automatically [installs fzf](https://github.com/junegunn/fzf#installation) if `brew` (or `git`) is available.
 
-## Simple Completion for Custom commands/scripts (`zsh` only)
+## Simple Completion for Custom Commands/Scripts (zsh only)
 
-The `lib/settings.sh` file contains `_fzf-configs-completion()` that we're
-using for `fzf_default_completion`. For example, to add your own completions
-for a custom script named `doge`, create a file named:
+`lib/settings.sh` registers `_fzf-configs-completion()` as `fzf_default_completion`. To add fuzzy completion for a custom command named `doge`, create:
 
 - `$HOME/.config/fzf-configs/completions/doge.zsh`
 
-and add something like:
+The file must use `$fzf` and set `$matches`:
 
+```zsh
+# keep "$query" pristine, use "$q" to form --query arg
+[[ -n $query ]] && q="--query=$query"
+matches=$(
+  echo "
+    option-1
+    option-2
+    option-3
+  " | sed 's/#.*//;s/  */ /g;/^ *$/d' | ${fzf} $q
+)
 ```
- # keep "$query" pristine, use "$q" to form --query arg
- [[ -n $query ]] && q="--query=$query"
- matches=$(
-   echo "
-     option-1
-     option-2
-     option-3
-   " | sed 's/#.*//;s/  */ /g;/^ *$/d' | ${fzf} $q
- )
-```
 
-This file **has** to contain something that uses `$fzf` and sets `$matches`.
+## Fuzzy Credential Managers
 
-## fzf-git
-- https://junegunn.kr/2016/07/fzf-git/
-  - https://gist.github.com/junegunn/8b572b8d4b5eddd8b85e5f4d40f17236
-- https://github.com/zulu-zsh/plugin-fzf-git
-- https://github.com/junegunn/fzf/wiki/Examples
-- https://github.com/wfxr/forgit
+| Script | Backend | Description |
+|--------|---------|-------------|
+| `fzlp` | [LastPass CLI](https://github.com/lastpass/lastpass-cli) (`lpass`) | Fuzzy LastPass browser |
+| `fzbw` | [Bitwarden CLI](https://bitwarden.com/help/cli/) (`bw`) | Fuzzy Bitwarden browser |
+| `fz1p` | [1Password CLI](https://developer.1password.com/docs/cli/) (`op`) | Fuzzy 1Password browser |
 
-```
-# Default keybindings, etc. are assigned to FZF_DEFAULT_OPTS
+All three support:
 
-# fzf's -m, --multi option ("Enable multi-select with tab/shift-tab") is used
-# whenever appropriate
+| Key | Action |
+|-----|--------|
+| `Enter` | View full item |
+| `CTRL-P` | Copy password to clipboard |
+| `CTRL-O` | Copy username to clipboard |
 
-CTRL-G CTRL-F for files
-  CTRL-D: git diff ...
-  CTRL-W: git diff -w --word-diff...
-  CTRL-H: git log -p ...
-  CTRL-A: git add ...
-  CTRL-R: git checkout -- ...
-  CTRL-S: git stash push ...
-  CTRL-X: git rm -f ...
-  CTRL-T: git commit -m "[WIP] list of files"...
-  CTRL-Y: git add ...; git  commit --amend --no-edit ...
-  # NOTE: if $TMUX is set, split-window and...
-  CTRL-U: git add ...; git  commit --amend ...
-  CTRL-E: "${EDITOR:-vim}" ...
-  CTRL-O: git add ...; git  commit --amend ...
-  CTRL-P: git add -p ...
+## fzf-git Keybindings
 
-CTRL-G CTRL-B for branches
-  CTRL-S: git log  -p ..<selected_branch>
-  CTRL-D: git diff -p <selected_branch> # current branch
-  CTRL-F: git log  -p <selected_branch>..
-  CTRL-N: git log --name-status
-  CTRL-P: git log -p
-  CTRL-R: git branch   -m <oldbranch>  <newbranch>   # NOTE: <oldbranch>   is the current branch under the cursor
-  CTRL-W: git checkout -b <new_branch> <start_point> # NOTE: <start_point> is the current branch under the cursor
-  CTRL-O: git checkout ...  # NOTE: this WILL stash first, if dirty
-  CTRL-X: git branch -D ... # NOTE: this WILL delete remote references too
-  ALT-M:  git merge ...
+Inspired by [junegunn's fzf-git post](https://junegunn.kr/2016/07/fzf-git/) and [gist](https://gist.github.com/junegunn/8b572b8d4b5eddd8b85e5f4d40f17236). See also: [fzf examples](https://github.com/junegunn/fzf/wiki/Examples), [forgit](https://github.com/wfxr/forgit).
 
-CTRL-G CTRL-T for tags
+Multi-select with `Tab`/`Shift-Tab` is enabled wherever it makes sense.
 
-CTRL-G CTRL-R for remotes
-  CTRL-X: git remote remove ...
-  CTRL-F: git fetch ...
-  CTRL-P: git pull ...
-  ALT-P:  git remote prune ...
+### `CTRL-G CTRL-F` — Files (git status)
 
-CTRL-G CTRL-H for commit hashes
-CTRL-G h        ""
+| Key | Action |
+|-----|--------|
+| `CTRL-D` | `git diff` |
+| `CTRL-W` | `git diff -w --word-diff` |
+| `CTRL-H` | `git log -p` |
+| `CTRL-A` | `git add` |
+| `CTRL-R` | `git checkout --` (revert) |
+| `CTRL-S` | `git stash push` |
+| `CTRL-X` | `git rm -f` |
+| `CTRL-T` | `git commit -m "[WIP] <list of files>"` |
+| `CTRL-Y` | `git add` + `git commit --amend --no-edit` |
+| `CTRL-U` | `git add` + `git commit --amend` *(tmux only)* |
+| `CTRL-E` | `$EDITOR` *(tmux only)* |
+| `CTRL-O` | `git add` + `git commit` *(tmux only)* |
+| `CTRL-P` | `git add -p` *(tmux only)* |
 
-CTRL-G CTRL-A for Aliases
+### `CTRL-G CTRL-B` — Branches
 
-CTRL-G CTRL-L for log
-CTRL-G L        ""
-  CTRL-D: git diff ...
-  CTRL-W: git show -w --word-diff ...
-  Enter:  git show ...
+| Key | Action |
+|-----|--------|
+| `CTRL-S` | `git log -p ..<branch>` |
+| `CTRL-D` | `git diff <branch>` |
+| `CTRL-F` | `git log -p <branch>..` |
+| `CTRL-N` | `git log --name-status` |
+| `CTRL-P` | `git log -p` |
+| `CTRL-R` | `git branch -m <old> <new>` (renames branch under cursor) |
+| `CTRL-W` | `git checkout -b <new> <start>` (new branch from cursor) |
+| `CTRL-O` | `git checkout` (stashes first if dirty) |
+| `CTRL-X` | `git branch -D` (also removes remote references) |
+| `ALT-M`  | `git merge` |
 
-CTRL-G CTRL-S for stashes # NOTE: this will offer to "en-stash" some or all files when invoked
-  ALT-B:  git stash branch <branchname>
-  CTRL-O: git stash pop
-  CTRL-Y: git stash apply
-  CTRL-X: git stash drop
+### `CTRL-G CTRL-T` — Tags
 
-CTRL-G CTRL-/ for fzf-git help
-CTRL-G CTRL-D for git diff
-CTRL-G CTRL-E for edit modified files
-CTRL-G CTRL-G for git status
-CTRL-G CTRL-P for git pull
-CTRL-G ALT-P  for git push
-```
+### `CTRL-G CTRL-R` — Remotes
+
+| Key | Action |
+|-----|--------|
+| `CTRL-X` | `git remote remove` |
+| `CTRL-F` | `git fetch` |
+| `CTRL-P` | `git pull` |
+| `ALT-P`  | `git remote prune` |
+
+### `CTRL-G CTRL-H` / `CTRL-G h` — Commit hashes
+
+### `CTRL-G CTRL-A` — Aliases
+
+### `CTRL-G CTRL-L` / `CTRL-G L` — Log
+
+| Key | Action |
+|-----|--------|
+| `CTRL-D` | `git diff` |
+| `CTRL-W` | `git show -w --word-diff` |
+| `Enter`  | `git show` |
+
+### `CTRL-G CTRL-S` — Stashes
+
+Offers to stash uncommitted changes when invoked.
+
+| Key | Action |
+|-----|--------|
+| `ALT-B`  | `git stash branch <branchname>` |
+| `CTRL-O` | `git stash pop` |
+| `CTRL-Y` | `git stash apply` |
+| `CTRL-X` | `git stash drop` |
+
+### Other bindings
+
+| Key | Action |
+|-----|--------|
+| `CTRL-G CTRL-_` | Open fzf-git help |
+| `CTRL-G CTRL-D` | `git diff` |
+| `CTRL-G CTRL-E` | Edit modified files |
+| `CTRL-G CTRL-G` | `git status` |
+| `CTRL-G CTRL-P` | `git pull` |
+| `CTRL-G ALT-P`  | `git push` |
