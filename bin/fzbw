@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+
+# Inspired by: http://junegunn.kr/2015/03/browsing-git-commits-with-fzf/
+#
+# FuZzy BitWarden (using fzf)
+
+PLUGIN_D="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
+# shellcheck disable=SC1091
+source "$PLUGIN_D/lib/utils.sh"
+
+function bw_ensure_unlocked() {
+  local status
+  status=$(bw status 2>/dev/null | jq -r '.status' 2>/dev/null)
+
+  case "$status" in
+    unauthenticated)
+      bw login || die "Bitwarden login failed."
+      BW_SESSION=$(bw unlock --raw) || die "Bitwarden unlock failed."
+      export BW_SESSION
+      ;;
+    locked)
+      BW_SESSION=$(bw unlock --raw) || die "Bitwarden unlock failed."
+      export BW_SESSION
+      ;;
+    unlocked)
+      [[ -n "$BW_SESSION" ]] || {
+        BW_SESSION=$(bw unlock --raw) || die "Bitwarden unlock failed."
+        export BW_SESSION
+      }
+      ;;
+    *)
+      die "Could not determine Bitwarden status."
+      ;;
+  esac
+}
+
+cmd_exists fzf || die "You don't have fzf installed!"
+cmd_exists bw  || die "You don't have bw installed!"
+cmd_exists jq  || die "You don't have jq installed!"
+
+bw_ensure_unlocked
+
+items=$(bw list items 2>/dev/null) || die "Failed to list Bitwarden items."
+items_display=$(
+  jq -r '.[] | "\(.id)\t\(.name) [\(.login.username // "")]"' <<< "$items"
+)
+
+while out=$(
+  fzf --ansi --no-sort --reverse --query="$q" \
+      --delimiter='\t' \
+      --with-nth=2.. \
+      --prompt="Select: view:<enter>, cp u:^o, quit:^c, cp p:^p: $msg" \
+      --print-query \
+      --expect=ctrl-o,ctrl-p \
+      --toggle-sort=\` <<< "$items_display"
+); do
+
+  q=$(head -1 <<< "$out")
+  k=$(head -2 <<< "$out" | tail -1)
+  id="$(sed '1,2d;/^$/d' <<< "$out" | cut -f1)"
+
+  if [[ -z "$id" ]]; then
+    msg='[ID WAS EMPTY] '
+  else
+    case "$k" in
+      ctrl-o)
+        bw get username "$id" | clip
+        msg="[COPIED USERNAME, id: $id] "
+        ;;
+      ctrl-p)
+        bw get password "$id" | clip
+        msg="[COPIED PASSWORD, id: $id] "
+        ;;
+      *)
+        bw get item "$id" | jq . | less -Rc
+        msg=""
+        ;;
+    esac
+  fi
+done
