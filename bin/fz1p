@@ -1,0 +1,60 @@
+#!/usr/bin/env bash
+
+# Inspired by: http://junegunn.kr/2015/03/browsing-git-commits-with-fzf/
+#
+# FuZzy 1Password (using fzf)
+
+PLUGIN_D="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
+# shellcheck disable=SC1091
+source "$PLUGIN_D/lib/utils.sh"
+
+function op_ensure_signed_in() {
+  op whoami > /dev/null 2>&1 || {
+    eval "$(op signin)" || die "1Password sign-in failed."
+  }
+}
+
+cmd_exists fzf || die "You don't have fzf installed!"
+cmd_exists op  || die "You don't have op installed!"
+cmd_exists jq  || die "You don't have jq installed!"
+
+op_ensure_signed_in
+
+items=$(op item list --format=json 2>/dev/null) || die "Failed to list 1Password items."
+items_display=$(
+  jq -r '.[] | "\(.id)\t\(.title) [\(.vault.name)]"' <<< "$items"
+)
+
+while out=$(
+  fzf --ansi --no-sort --reverse --query="$q" \
+      --delimiter='\t' \
+      --with-nth=2.. \
+      --prompt="Select: view:<enter>, cp u:^o, quit:^c, cp p:^p: $msg" \
+      --print-query \
+      --expect=ctrl-o,ctrl-p \
+      --toggle-sort=\` <<< "$items_display"
+); do
+
+  q=$(head -1 <<< "$out")
+  k=$(head -2 <<< "$out" | tail -1)
+  id="$(sed '1,2d;/^$/d' <<< "$out" | cut -f1)"
+
+  if [[ -z "$id" ]]; then
+    msg='[ID WAS EMPTY] '
+  else
+    case "$k" in
+      ctrl-o)
+        op item get "$id" --fields label=username | clip
+        msg="[COPIED USERNAME, id: $id] "
+        ;;
+      ctrl-p)
+        op item get "$id" --fields label=password | clip
+        msg="[COPIED PASSWORD, id: $id] "
+        ;;
+      *)
+        op item get "$id" --format=json | jq . | less -Rc
+        msg=""
+        ;;
+    esac
+  fi
+done
