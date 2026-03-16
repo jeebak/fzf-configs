@@ -1,0 +1,2 @@
+#!/usr/bin/env bash
+printenv FZF_DEFAULT_OPTS | grep -o -- '--bind=[^ ]*' | sed 's/--bind=//;s/,/\n/g'

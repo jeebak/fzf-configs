@@ -33,6 +33,7 @@ The codebase uses several intentional shellcheck disables:
 - `git/key-bindings.bash` — (currently empty, reserved)
 
 **`libexec/` scripts** (internal helpers, not added to PATH):
+- `key-bindings-help` — prints the keybindings from `FZF_DEFAULT_OPTS`; invoked via full path (`$PLUGIN_D/libexec/key-bindings-help`) in `--bind` execute strings
 - `preview` — file preview helper: uses `lsd`/`tree` for dirs, `bat`/`highlight`/`coderay`/`rougify`/`cat` for files; invoked via full path (`$PLUGIN_D/libexec/preview`) in `--preview` strings
 
 **`bin/` scripts** (added to PATH by `settings.sh`):

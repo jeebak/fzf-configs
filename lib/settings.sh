@@ -10,7 +10,7 @@ FZF_DEFAULT_OPTS="$(
     alt-k:preview-up
     ctrl-f:preview-page-down
     ctrl-b:preview-page-up
-    \?:toggle-preview
+    alt-v:toggle-preview
     alt-w:toggle-preview-wrap
     # Select all
     alt-a:toggle-all
@@ -46,10 +46,21 @@ export FZF_DEFAULT_OPTS
 #   Set FZF_CTRL_T_OPTS to pass additional options
 # export FZF_CTRL_T_COMMAND='git ls-files'
 
+header="📝: ^e:edit"
+prompt="  👀: ^c:copy,^v:view,?:help: "
+
+# Lines of "preview"
+LINES=1000
+
 # Try bat, highlight, coderay, rougify in turn, then fall back to cat
 export FZF_CTRL_T_OPTS="
-  --bind 'ctrl-o:execute(less {} > /dev/tty)'
-  --preview '$PLUGIN_D/libexec/preview {} 1000'
+  --header='$header'
+  --prompt='$prompt'
+  --bind 'ctrl-c:execute(echo {} > /dev/tty)'
+  --bind 'ctrl-e:execute(${EDITOR:-vim} {} > /dev/tty)'
+  --bind 'ctrl-v:execute(${PAGER:-less} {} > /dev/tty)'
+  --bind '?:execute($PLUGIN_D/libexec/key-bindings-help | ${PAGER:-less} > /dev/tty)'
+  --preview '$PLUGIN_D/libexec/preview {} $LINES'
 "
 
 # CTRL-R - Paste the selected command from history onto the command-line
@@ -59,9 +70,11 @@ export FZF_CTRL_T_OPTS="
 # ALT-C - cd into the selected directory
 #   Set FZF_ALT_C_COMMAND to override the default command
 #   Set FZF_ALT_C_OPTS to pass additional options
+prompt="  👀: ^v:view: "
 export FZF_ALT_C_OPTS="
-  --bind 'ctrl-o:execute(less {} > /dev/tty)'
-  --preview '$PLUGIN_D/libexec/preview {} 1000'
+  --prompt='$prompt'
+  --bind 'ctrl-v:execute(${PAGER:-less} {} > /dev/tty)'
+  --preview '$PLUGIN_D/libexec/preview {} $LINES'
 "
 
 export FZF_TMUX_HEIGHT='70%'
