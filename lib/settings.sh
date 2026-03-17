@@ -22,6 +22,7 @@ FZF_DEFAULT_OPTS="$(
   echo "
 # Keybindings
     --bind=${bindings// /,}
+    --bind='?:execute($PLUGIN_D/libexec/key-bindings-help | ${PAGER:-less} > /dev/tty)'
 
 # https://github.com/junegunn/fzf/wiki/Color-schemes#seoul256-dusk
 # Seoul256 Dusk
@@ -59,7 +60,6 @@ export FZF_CTRL_T_OPTS="
   --bind 'ctrl-c:execute(echo {} > /dev/tty)'
   --bind 'ctrl-e:execute(${EDITOR:-vim} {} > /dev/tty)'
   --bind 'ctrl-v:execute(${PAGER:-less} {} > /dev/tty)'
-  --bind '?:execute($PLUGIN_D/libexec/key-bindings-help | ${PAGER:-less} > /dev/tty)'
   --preview '$PLUGIN_D/libexec/preview {} $LINES'
 "
 
