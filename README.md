@@ -134,8 +134,8 @@ These are set via `FZF_DEFAULT_OPTS` and apply to every fzf instance.
 
 | Scope | Keys claimed |
 |-------|------|
-| `FZF_DEFAULT_OPTS` | `alt-j`, `alt-k`, `ctrl-f`, `ctrl-b`, `alt-v`, `alt-w`, `alt-a`, `ctrl-z` |
-| `FZF_CTRL_T/ALT_C_OPTS` | `ctrl-c`, `ctrl-e`, `ctrl-v`, `?` |
+| `FZF_DEFAULT_OPTS` | `alt-j`, `alt-k`, `ctrl-f`, `ctrl-b`, `alt-v`, `alt-w`, `alt-a`, `ctrl-z`, `?` |
+| `FZF_CTRL_T/ALT_C_OPTS` | `ctrl-c`, `ctrl-e`, `ctrl-v` |
 | `gf()` | `ctrl-a/d/h/l/n/r/s/t/w/x/y`, `alt-t`, tmux: `ctrl-e/o/p/u` |
 | `gb()` | `ctrl-d/f/n/p/r/s/w/o/x`, `alt-m` |
 | `gr()` | `ctrl-f/p/x`, `alt-p` |
@@ -196,6 +196,10 @@ Multi-select with `Tab`/`Shift-Tab` is enabled wherever it makes sense.
 | `ALT-P`  | `git remote prune` |
 
 ### `CTRL-G CTRL-H` / `CTRL-G h` — Commit hashes
+
+| Key | Action |
+|-----|--------|
+| `CTRL-S` | Toggle sort |
 
 ### `CTRL-G CTRL-A` — Aliases
 
