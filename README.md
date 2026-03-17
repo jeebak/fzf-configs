@@ -99,6 +99,52 @@ All three support:
 | `CTRL-P` | Copy password to clipboard |
 | `CTRL-O` | Copy username to clipboard |
 
+## Global fzf Keybindings
+
+These are set via `FZF_DEFAULT_OPTS` and apply to every fzf instance.
+
+### Preview
+
+| Key | Action |
+|-----|--------|
+| `ALT-J` | Scroll preview down |
+| `ALT-K` | Scroll preview up |
+| `CTRL-F` | Scroll preview page down |
+| `CTRL-B` | Scroll preview page up |
+| `ALT-V` | Toggle preview pane |
+| `ALT-W` | Toggle preview wrap |
+
+### Other
+
+| Key | Action |
+|-----|--------|
+| `ALT-A` | Toggle select all |
+| `CTRL-Z` | Clear screen |
+
+### `CTRL-T` (file picker)
+
+| Key | Action |
+|-----|--------|
+| `CTRL-C` | Copy filename |
+| `CTRL-E` | Open in `$EDITOR` |
+| `CTRL-V` | Open in `$PAGER` |
+| `?` | Show all preview keybindings |
+
+### Key Scope Reference
+
+| Scope | Keys claimed |
+|-------|------|
+| `FZF_DEFAULT_OPTS` | `alt-j`, `alt-k`, `ctrl-f`, `ctrl-b`, `alt-v`, `alt-w`, `alt-a`, `ctrl-z` |
+| `FZF_CTRL_T/ALT_C_OPTS` | `ctrl-c`, `ctrl-e`, `ctrl-v`, `?` |
+| `gf()` | `ctrl-a/d/h/l/n/r/s/t/w/x/y`, `alt-t`, tmux: `ctrl-e/o/p/u` |
+| `gb()` | `ctrl-d/f/n/p/r/s/w/o/x`, `alt-m` |
+| `gr()` | `ctrl-f/p/x`, `alt-p` |
+| `gs()` | `ctrl-d/o/x/y`, `alt-b`, `enter` |
+| `gl()` | `ctrl-d/m/w` |
+| `gh()` | `ctrl-s` |
+
+---
+
 ## fzf-git Keybindings
 
 Inspired by [junegunn's fzf-git post](https://junegunn.kr/2016/07/fzf-git/) and [gist](https://gist.github.com/junegunn/8b572b8d4b5eddd8b85e5f4d40f17236). See also: [fzf examples](https://github.com/junegunn/fzf/wiki/Examples), [forgit](https://github.com/wfxr/forgit).
