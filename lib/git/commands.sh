@@ -91,7 +91,7 @@ gf() {
   fi
 
   fzf_opts=(
-    -m --ansi "--nth=2..,.."
+    -m --ansi "--nth=2..,.." --border --border-label=" git status "
     --header="$header"
     --prompt="$prompt"
     --bind="alt-t:toggle-all"
@@ -191,7 +191,7 @@ gb() {
   # shellcheck disable=SC2207
   out=($(
     git branch -a --color=always | grep -v '/HEAD\s' | sort |
-    fzf --ansi --multi --tac \
+    fzf --ansi --multi --tac --border --border-label=" git branches " \
       --header="$header" \
       --prompt="$prompt" \
       --expect="$expect" \
@@ -286,6 +286,7 @@ gt() {
   is_in_git_repo || return
   git tag --sort -version:refname |
   fzf-down --multi \
+    --border-label=" git tags " \
     --preview="git show --color=always {} | head -$LINES"
 }
 
@@ -297,6 +298,7 @@ gh() {
   prompt="  👀: ^s:toggle-sort,?:help: "
 
   fzf-down --ansi --no-sort --reverse --multi \
+    --border-label=" git hashes " \
     --header 'Press CTRL-S to toggle sort' \
     --prompt="$prompt" \
     --bind='ctrl-s:toggle-sort' \
@@ -317,6 +319,7 @@ gr() {
   out=($(
     git remote -v | awk '{print $1 "\t" $2}' | uniq |
     fzf-down --tac \
+      --border-label=" git remotes " \
       --header="$header" \
       --prompt="$prompt" \
       --expect="$expect" \
@@ -358,7 +361,7 @@ gr() {
 ga() {
   git config --get-regexp 'alias.*' |
     sed 's/^alias\.\([^ ]*\) \(.*\)/ \1#=> \2/' | column -s'#' -t | sort |
-  fzf-down | awk '{ print $1; }'
+  fzf-down --border-label=" git aliases " | awk '{ print $1; }'
 }
 
 gl() {
@@ -373,6 +376,7 @@ gl() {
   git log --graph --color=always \
     --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
   fzf --ansi --no-sort --reverse --tiebreak=index --toggle-sort=\` \
+      --border --border-label=" git log " \
       --prompt="$prompt" \
       --bind="ctrl-d:execute:echo {} | grep -Eo '[a-f0-9]+' | head -1 |
         xargs -I % bash -c 'git diff --color=always -p % |
@@ -420,7 +424,7 @@ gs() {
   if [[ -s "$(git rev-parse --git-dir)/refs/stash" ]]; then
     # shellcheck disable=SC2016
     git stash list --pretty='%C(yellow)%gd %>(14)%Cgreen%cr %C(blue)%gs' |
-    fzf --ansi --no-sort --border --reverse \
+    fzf --ansi --no-sort --border --border-label=" git stashes " --reverse \
       --header="$header" \
       --prompt="$prompt" \
       --bind="enter:execute(_pager git stash show --color=always -p \$(cut -d' ' -f1 <<< {}))" \
@@ -444,7 +448,8 @@ gw() {
   reload_cmd="git worktree list"
 
   git worktree list |
-  fzf --header="📝: ^x:remove" \
+  fzf --border --border-label=" git worktrees " \
+    --header="📝: ^x:remove" \
     --prompt="  👀: ?:help: " \
     --bind="ctrl-x:execute-silent(git worktree remove {1})+reload($reload_cmd)" \
     --preview="git -C {1} log --color=always --oneline --graph --date=short \
@@ -459,6 +464,7 @@ grl() {
     --format="%C(yellow)%gd %C(green)%cd %C(auto)%h%d %C(blue)%gs" \
     --date=short |
   fzf --ansi --no-sort --reverse \
+    --border --border-label=" git reflog " \
     --prompt="  👀: ?:help: " \
     --preview="grep -o '[a-f0-9]\{7,\}' <<< {} | head -1 |
       xargs -I% git show --color=always --stat -p % | head -$LINES" |
