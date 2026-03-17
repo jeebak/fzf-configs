@@ -8,11 +8,12 @@ source "$PLUGIN_D/lib/utils.sh"
 
 mapfile -t items < "$1"
 
-{
-  for item in "${items[@]}"; do
-    case "$item" in
-      /*) printf '%s\n' "$item" ;;
-      *)  printf '%s/%s\n' "$PWD" "$item" ;;
-    esac
-  done
-} | clip
+paths=()
+for item in "${items[@]}"; do
+  case "$item" in
+    /*) paths+=("$item") ;;
+    *)  paths+=("$PWD/$item") ;;
+  esac
+done
+
+( IFS=' '; printf '%s\n' "${paths[*]}" ) | clip
