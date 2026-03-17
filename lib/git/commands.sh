@@ -184,7 +184,7 @@ gb() {
   is_in_git_repo || return
   local header prompt expect out branch yn msg branchlist parts
 
-  header="📝: ^r:rename,^w:new,^o:checkout,^x:delete,alt-m:merge"
+  header="📝: ^r:rename,^w:new,^o:checkout,^x:delete,alt-m:merge,alt-o:open"
   prompt="  👀: ^s:log ..b,^d:diff,^f:log b..,^n:log --n-s,^p:log -p,?:help: "
   expect="ctrl-r,ctrl-w,ctrl-o,ctrl-x,alt-m"
 
@@ -205,6 +205,16 @@ gb() {
         --name-status \$(sed s'/* //' <<< {})" \
       --bind="ctrl-p:execute: _pager git log --color=always --stat \
         -p \$(sed s'/* //' <<< {})" \
+      --bind="alt-o:execute-silent(
+        branch=\$(sed 's/\x1b\[[0-9;]*m//g' <<< {-1} | sed 's|^remotes/[^/]*/||')
+        remote=\$(git config \"branch.\$branch.remote\" 2>/dev/null || echo origin)
+        remote_url=\$(git remote get-url \"\$remote\" 2>/dev/null ||
+          git remote get-url origin 2>/dev/null)
+        [[ -z \"\$remote_url\" ]] && exit 0
+        url=\${remote_url%.git}; url=\${url#git@}; url=https://\${url/://}
+        xdg-open \"\$url/tree/\$branch\" 2>/dev/null ||
+          open \"\$url/tree/\$branch\" 2>/dev/null
+      )" \
       --preview="git log --color=always --oneline --graph --date=short \
         --pretty='format:%C(auto)%cd %h%d %s' \
         \$(sed s/^..// <<< {} | cut -d' ' -f1) | head -$LINES" |
@@ -384,7 +394,7 @@ gs() {
   local header prompt reload_cmd yn msg out
 
   header="📝: alt-b:branch,^o:pop,^y:apply,^x:drop"
-  prompt="  👀: enter:show,^d:diff,?:preview-help: "
+  prompt="  👀: enter:show,^d:diff,?:help: "
   reload_cmd='git stash list --pretty=format:"%C(yellow)%gd %>(14)%Cgreen%cr %C(blue)%gs"'
 
   # Stash, if dirty
@@ -426,6 +436,33 @@ gs() {
   else
     echo -n "$(tput bold)$(tput setaf 7)No stashes found!$(tput sgr0)"
   fi
+}
+
+gw() {
+  is_in_git_repo || return
+  local reload_cmd
+  reload_cmd="git worktree list"
+
+  git worktree list |
+  fzf --header="📝: ^x:remove" \
+    --prompt="  👀: ?:help: " \
+    --bind="ctrl-x:execute-silent(git worktree remove {1})+reload($reload_cmd)" \
+    --preview="git -C {1} log --color=always --oneline --graph --date=short \
+      --pretty='format:%C(auto)%cd %h%d %s' | head -$LINES" |
+  awk '{print $1}'
+}
+
+grl() {
+  is_in_git_repo || return
+
+  git reflog --color=always \
+    --format="%C(yellow)%gd %C(green)%cd %C(auto)%h%d %C(blue)%gs" \
+    --date=short |
+  fzf --ansi --no-sort --reverse \
+    --prompt="  👀: ?:help: " \
+    --preview="grep -o '[a-f0-9]\{7,\}' <<< {} | head -1 |
+      xargs -I% git show --color=always --stat -p % | head -$LINES" |
+  grep -o "[a-f0-9]\{7,\}" | head -1
 }
 
 edit-modified() {

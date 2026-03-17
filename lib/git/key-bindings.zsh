@@ -32,7 +32,7 @@ bind-git-helper() {
   done
 }
 
-bind-git-helper f b t r h l a
+bind-git-helper f b t r h l a w
 # For tmux users that have ^{h,j,k,l} mapped to "select-pane -{L,D,U,R}"
 FZF_CONFIGS_NO_CONTROL=true bind-git-helper h j k l
 
@@ -50,10 +50,26 @@ bind-git-helper-no-join() {
 
 bind-git-helper-no-join s
 
+fzf-grl-widget() {
+  local result
+  result=$(fzf-git grl | join-lines)
+  local buffer=$BUFFER
+  zle reset-prompt
+  if [[ -n $result ]]; then
+    LBUFFER+=$result
+  else
+    zle kill-whole-line
+    zle accept-line
+    print -z "$buffer"
+  fi
+}
+zle -N fzf-grl-widget
+bindkey '^g^v' fzf-grl-widget
+
 unset -f bind-git-helper bind-git-helper-no-join
 
 # Avail.   '^g^q'
-#   "      '^g^w'
+# Worktrees'^g^w'
 bindkey -s '^g^e' " ^ufzf-git edit-modified\n^y^h"
 # Remotes  '^g^r'
 # Tags     '^g^t'
@@ -81,7 +97,7 @@ bindkey -s '^g^g' " ^ugit status\n^y^h"
 # Avail.   '^g^z'
 #   "      '^g^x'
 # N/A      '^g^c'
-# Avail.   '^g^v'
+# Reflogs  '^g^v'
 # Branches '^g^b'
 # Avail.   '^g^n'
 #   "      '^g^m'
