@@ -19,18 +19,26 @@ FZF_DEFAULT_OPTS="$(
   )
   bindings="${bindings[*]}"
 
+  color_opts=""
+  # Respect https://no-color.org/
+  if [[ -z "${NO_COLOR}" ]]; then
+    color_opts="
+# https://github.com/junegunn/fzf/wiki/Color-schemes#seoul256-dusk
+# Seoul256 Dusk
+      --color fg:242,bg:236,hl:65,fg+:15,bg+:239,hl+:108
+      --color info:108,prompt:109,spinner:108,pointer:168,marker:168
+# Seoul256 Night
+#     --color fg:242,bg:233,hl:65,fg+:15,bg+:234,hl+:108
+#     --color info:108,prompt:109,spinner:108,pointer:168,marker:168
+    "
+  fi
+
   echo "
 # Keybindings
     --bind=${bindings// /,}
     --bind='?:execute($PLUGIN_D/libexec/key-bindings-help | ${PAGER:-less} > /dev/tty)'
 
-# https://github.com/junegunn/fzf/wiki/Color-schemes#seoul256-dusk
-# Seoul256 Dusk
-    --color fg:242,bg:236,hl:65,fg+:15,bg+:239,hl+:108
-    --color info:108,prompt:109,spinner:108,pointer:168,marker:168
-# Seoul256 Night
-#   --color fg:242,bg:233,hl:65,fg+:15,bg+:234,hl+:108
-#   --color info:108,prompt:109,spinner:108,pointer:168,marker:168
+$color_opts
 
 # Misc
     --inline-info # Display finder info inline with the query
