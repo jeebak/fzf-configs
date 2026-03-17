@@ -74,7 +74,7 @@ gf() {
   local header prompt expect out pane_id file fileslist joined
 
   header="📝: ^a:add,^r:revert,^s:stash,^x:rm,^t:wip,^y:amend-no-edit"
-  prompt="  👀: ^d:diff,^w:word-diff,^h:history {},^n:log --n-s,^l:log -p:alt-t:toggle-all: "
+  prompt="  👀: ^d:diff,^w:word-diff,^h:history {},^n:log --n-s,^l:log -p,alt-t:toggle-all,?:help: "
   expect="ctrl-a,ctrl-r,ctrl-s,ctrl-x,ctrl-t,ctrl-y"
 
   if [[ -n "$TMUX" ]]; then
@@ -196,7 +196,7 @@ gb() {
   local header prompt expect out branch yn msg branchlist parts
 
   header="📝: ^r:rename,^w:new,^o:checkout,^x:delete,alt-m:merge"
-  prompt="  👀: ^s:log ..b,^d:diff,^f:log b..,^n:log --n-s,^p:log -p: "
+  prompt="  👀: ^s:log ..b,^d:diff,^f:log b..,^n:log --n-s,^p:log -p,?:help: "
   expect="ctrl-r,ctrl-w,ctrl-o,ctrl-x,alt-m"
 
   # shellcheck disable=SC2207
@@ -294,8 +294,12 @@ gh() {
   is_in_git_repo || return
   git log --date=short --format="%C(green)%C(bold)%cd %C(auto)%h%d %s (%an)" \
     --graph --color=always |
+  local prompt
+  prompt="  👀: ^s:toggle-sort,?:help: "
+
   fzf-down --ansi --no-sort --reverse --multi \
     --header 'Press CTRL-S to toggle sort' \
+    --prompt="$prompt" \
     --bind='ctrl-s:toggle-sort' \
     --preview='grep -o "[a-f0-9]\{7,\}" <<< {} |
                 xargs git show --color=always | head -'$LINES |
@@ -307,6 +311,7 @@ gr() {
   local header prompt expect out remote yn msg remoteslist r
 
   header="📝: ^x:remove,^f:fetch,^p:pull,alt-p:prune"
+  prompt="  👀: ^x:remove,^f:fetch,^p:pull,?:help: "
   expect="alt-p"
 
   # shellcheck disable=SC2207
@@ -314,6 +319,7 @@ gr() {
     git remote -v | awk '{print $1 "\t" $2}' | uniq |
     fzf-down --tac \
       --header="$header" \
+      --prompt="$prompt" \
       --expect="$expect" \
       --bind="ctrl-x:execute: _pager git remote remove {1}" \
       --bind="ctrl-f:execute: _pager git fetch {1}" \
@@ -360,7 +366,7 @@ gl() {
   is_in_git_repo || return
   local prompt
 
-  prompt="  👀: ^d:diff,^w:show word-diff,<enter>:show: "
+  prompt="  👀: ^d:diff,^w:show word-diff,<enter>:show,?:help: "
 
   # http://junegunn.kr/2015/03/browsing-git-commits-with-fzf/
   #   Based on: https://gist.github.com/junegunn/f4fca918e937e6bf5bad
@@ -389,7 +395,7 @@ gs() {
   local header prompt expect yn msg out k reflog branch
 
   header="📝: alt-b:branch,^o:pop,^y:apply,^x:drop"
-  prompt="  👀: enter:show,^d:diff: "
+  prompt="  👀: enter:show,^d:diff,?:help: "
   expect="alt-b,ctrl-o,ctrl-y,ctrl-x"
 
   # Stash, if dirty
