@@ -139,7 +139,9 @@ These are set via `FZF_DEFAULT_OPTS` and apply to every fzf instance.
 | `FZF_DEFAULT_OPTS` | `alt-j`, `alt-k`, `ctrl-f`, `ctrl-b`, `alt-v`, `alt-w`, `alt-a`, `ctrl-z`, `?` |
 | `FZF_CTRL_T/ALT_C_OPTS` | `ctrl-c`, `ctrl-e`, `ctrl-v`, `alt-y`, `alt-p` |
 | `gf()` | `ctrl-a/d/h/l/n/r/s/t/w/x/y`, `alt-t`, tmux: `ctrl-e/o/p/u` |
-| `gb()` | `ctrl-d/f/n/p/r/s/w/o/x`, `alt-m` |
+| `gb()` | `ctrl-d/f/n/p/r/s/w/o/x`, `alt-m/o` |
+| `gw()` | `ctrl-x` |
+| `grl()` | *(none — Enter outputs hash)* |
 | `gr()` | `ctrl-f/p/x`, `alt-p` |
 | `gs()` | `ctrl-d/o/x/y`, `alt-b`, `enter` |
 | `gl()` | `ctrl-d/m/w` |
@@ -185,6 +187,7 @@ Multi-select with `Tab`/`Shift-Tab` is enabled wherever it makes sense.
 | `CTRL-O` | `git checkout` (stashes first if dirty) |
 | `CTRL-X` | `git branch -D` (also removes remote references) |
 | `ALT-M`  | `git merge` |
+| `ALT-O`  | Open branch in browser (converts remote URL to HTTPS) |
 
 ### `CTRL-G CTRL-T` — Tags
 
@@ -204,6 +207,18 @@ Multi-select with `Tab`/`Shift-Tab` is enabled wherever it makes sense.
 | `CTRL-S` | Toggle sort |
 
 ### `CTRL-G CTRL-A` — Aliases
+
+### `CTRL-G CTRL-V` — Reflogs
+
+| Key | Action |
+|-----|--------|
+| `Enter` | Output hash to command line |
+
+### `CTRL-G CTRL-W` — Worktrees
+
+| Key | Action |
+|-----|--------|
+| `CTRL-X` | `git worktree remove` |
 
 ### `CTRL-G CTRL-L` / `CTRL-G L` — Log
 
@@ -233,4 +248,6 @@ Offers to stash uncommitted changes when invoked.
 | `CTRL-G CTRL-E` | Edit modified files |
 | `CTRL-G CTRL-G` | `git status` |
 | `CTRL-G CTRL-P` | `git pull` |
+| `CTRL-G CTRL-V` | Reflog browser |
+| `CTRL-G CTRL-W` | Worktrees browser |
 | `CTRL-G ALT-P`  | `git push` |
