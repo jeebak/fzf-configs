@@ -47,7 +47,7 @@ export FZF_DEFAULT_OPTS
 #   Set FZF_CTRL_T_OPTS to pass additional options
 # export FZF_CTRL_T_COMMAND='git ls-files'
 
-header="📝: ^e:edit"
+header="📝: ^e:edit,alt-y:yank-contents,alt-p:copy-path"
 prompt="  👀: ^c:copy,^v:view,?:help: "
 
 # Lines of "preview"
@@ -60,6 +60,8 @@ export FZF_CTRL_T_OPTS="
   --bind 'ctrl-c:execute(echo {} > /dev/tty)'
   --bind 'ctrl-e:execute(${EDITOR:-vim} {} > /dev/tty)'
   --bind 'ctrl-v:execute(${PAGER:-less} {} > /dev/tty)'
+  --bind 'alt-y:execute($PLUGIN_D/libexec/copy-file-contents {+f})'
+  --bind 'alt-p:execute($PLUGIN_D/libexec/copy-abspath {+f})'
   --preview '$PLUGIN_D/libexec/preview {} $LINES'
 "
 

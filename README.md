@@ -128,14 +128,16 @@ These are set via `FZF_DEFAULT_OPTS` and apply to every fzf instance.
 | `CTRL-C` | Copy filename |
 | `CTRL-E` | Open in `$EDITOR` |
 | `CTRL-V` | Open in `$PAGER` |
-| `?` | Show all preview keybindings |
+| `ALT-Y`  | Copy file contents to clipboard (single file only; errors on multiple selection or directory) |
+| `ALT-P`  | Copy absolute path(s) of all selected items to clipboard |
+| `?`      | Show all preview keybindings |
 
 ### Key Scope Reference
 
 | Scope | Keys claimed |
 |-------|------|
 | `FZF_DEFAULT_OPTS` | `alt-j`, `alt-k`, `ctrl-f`, `ctrl-b`, `alt-v`, `alt-w`, `alt-a`, `ctrl-z`, `?` |
-| `FZF_CTRL_T/ALT_C_OPTS` | `ctrl-c`, `ctrl-e`, `ctrl-v` |
+| `FZF_CTRL_T/ALT_C_OPTS` | `ctrl-c`, `ctrl-e`, `ctrl-v`, `alt-y`, `alt-p` |
 | `gf()` | `ctrl-a/d/h/l/n/r/s/t/w/x/y`, `alt-t`, tmux: `ctrl-e/o/p/u` |
 | `gb()` | `ctrl-d/f/n/p/r/s/w/o/x`, `alt-m` |
 | `gr()` | `ctrl-f/p/x`, `alt-p` |

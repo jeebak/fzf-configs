@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+# Copies the absolute paths of all selected items to the clipboard.
+# Expects the path to fzf's {+f} temp file as $1 (one selected item per line).
+
+PLUGIN_D="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
+# shellcheck disable=SC1091
+source "$PLUGIN_D/lib/utils.sh"
+
+mapfile -t items < "$1"
+
+{
+  for item in "${items[@]}"; do
+    case "$item" in
+      /*) printf '%s\n' "$item" ;;
+      *)  printf '%s/%s\n' "$PWD" "$item" ;;
+    esac
+  done
+} | clip

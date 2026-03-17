@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+# Copies the contents of a single selected file to the clipboard.
+# Expects the path to fzf's {+f} temp file as $1 (one selected item per line).
+
+PLUGIN_D="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
+# shellcheck disable=SC1091
+source "$PLUGIN_D/lib/utils.sh"
+
+mapfile -t items < "$1"
+
+if [[ ${#items[@]} -gt 1 ]]; then
+  printf 'Error: %d items selected (expected 1)\n' "${#items[@]}"
+elif [[ -d "${items[0]}" ]]; then
+  printf 'Error: "%s" is a directory\n' "${items[0]}"
+else
+  clip < "${items[0]}"
+fi
