@@ -8,6 +8,7 @@ elif [[ $(file --mime "$1") =~ binary ]]; then
   echo Binary: "$1"
 else
   ( bat --style=changes,grid,numbers --color=always "$1" ||
+    batcat --style=changes,grid,numbers --color=always "$1" ||
     highlight -O ansi -l "$1" ||
     coderay "$1" ||
     rougify "$1" ||
