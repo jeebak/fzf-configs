@@ -381,11 +381,11 @@ gs() {
   # Based on:
   #   https://gist.github.com/junegunn/a563d9e3e07fd721d618562762ec619d
   is_in_git_repo || return
-  local header prompt expect yn msg out k reflog branch
+  local header prompt reload_cmd yn msg out
 
   header="📝: alt-b:branch,^o:pop,^y:apply,^x:drop"
-  prompt="  👀: enter:show,^d:diff,?:help: "
-  expect="alt-b,ctrl-o,ctrl-y,ctrl-x"
+  prompt="  👀: enter:show,^d:diff,?:preview-help: "
+  reload_cmd='git stash list --pretty=format:"%C(yellow)%gd %>(14)%Cgreen%cr %C(blue)%gs"'
 
   # Stash, if dirty
   if git diff --quiet || yn=$(
@@ -408,44 +408,21 @@ gs() {
     [[ -n "$msg" ]] && echo -e "$msg" | _pager
   fi
   if [[ -s "$(git rev-parse --git-dir)/refs/stash" ]]; then
-    # shellcheck disable=SC2207
-    out=($(
-      git stash list --pretty='%C(yellow)%gd %>(14)%Cgreen%cr %C(blue)%gs' |
-      fzf --ansi --no-sort --border --reverse \
-        --header="$header" \
-        --prompt="$prompt" \
-        --expect="$expect" \
-        --bind="enter:execute(
-          _pager git stash show --color=always -p \$(cut -d' ' -f1 <<< {})
-        )" \
-        --bind="ctrl-d:execute(
-          _pager git diff --color=always --stat -p \$(cut -d' ' -f1 <<< {})
-        )" \
-        --preview="git stash show --color=always \
-          -p \$(cut -d' ' -f1 <<< {}) | head -$LINES"
-    ))
-    k=${out[0]}
-    reflog=${out[1]}
-    if [ -n "$reflog" ]; then
-      case "$k" in
-        alt-b)
-          branch="$(fzf-git-inputbox 'Enter a branchname: ')"
-          msg="$(git stash branch "$branch" "$reflog")"
-          ;;
-        ctrl-o)
-          msg="$(git stash pop "$reflog")"
-          ;;
-        ctrl-y)
-          msg="$(git stash apply "$reflog")"
-          ;;
-        ctrl-x)
-          if fzf-git-confirm "Really drop this stash?"; then
-            msg="$(git stash drop "$reflog")"
-          fi
-          ;;
-      esac
-      [[ -n "$msg" ]] && echo -e "$msg" | _pager
-    fi
+    # shellcheck disable=SC2016
+    git stash list --pretty='%C(yellow)%gd %>(14)%Cgreen%cr %C(blue)%gs' |
+    fzf --ansi --no-sort --border --reverse \
+      --header="$header" \
+      --prompt="$prompt" \
+      --bind="enter:execute(_pager git stash show --color=always -p \$(cut -d' ' -f1 <<< {}))" \
+      --bind="ctrl-d:execute(_pager git diff --color=always --stat -p \$(cut -d' ' -f1 <<< {}))" \
+      --bind="ctrl-x:execute-silent(git stash drop \$(cut -d' ' -f1 <<< {}))+reload($reload_cmd)" \
+      --bind="ctrl-o:execute(git stash pop \$(cut -d' ' -f1 <<< {}) | _pager)+reload($reload_cmd)" \
+      --bind="ctrl-y:execute-silent(git stash apply \$(cut -d' ' -f1 <<< {}))" \
+      --bind="alt-b:execute(
+        branch=\$(fzf-git-inputbox 'Enter a branchname: ')
+        [[ -n \"\$branch\" ]] && git stash branch \"\$branch\" \"\$(cut -d' ' -f1 <<< {})\" | _pager
+      )+reload($reload_cmd)" \
+      --preview="git stash show --color=always -p \$(cut -d' ' -f1 <<< {}) | head -$LINES"
   else
     echo -n "$(tput bold)$(tput setaf 7)No stashes found!$(tput sgr0)"
   fi
