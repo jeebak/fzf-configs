@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+# Extracts clean filenames from git status --short lines written to a {+f} file.
+# Outputs null-separated filenames suitable for: xargs -0 git add --
+# Usage: fzf-git-status-files <{+f} path>
+
+mapfile -t lines < "$1"
+for line in "${lines[@]}"; do
+  f="${line:3}"           # strip 2-char status code + space
+  f="${f/* -> /}"         # strip rename arrow (keep new name)
+  f="${f#\"}"             # strip leading quote (paths with spaces)
+  f="${f%\"}"             # strip trailing quote
+  printf '%s\0' "$f"
+done
