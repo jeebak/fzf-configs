@@ -7,10 +7,14 @@
 source "$PLUGIN_D/lib/utils.sh"
 
 _pager() {
+  # shellcheck disable=SC2086
+  local pager
+  pager="${FZF_GIT_PAGER:-${GIT_PAGER:-$(git config core.pager 2>/dev/null)}}"
+  pager="${pager:-less -Rc}"
   if [[ $# -eq 0 ]]; then
-    cat -    | less -Rc > /dev/tty
+    cat -    | $pager > /dev/tty
   else
-    reo "$@" | less -Rc > /dev/tty
+    reo "$@" | $pager > /dev/tty
   fi
 }
 
