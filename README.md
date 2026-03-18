@@ -4,7 +4,7 @@ A shell plugin that configures [fzf](https://github.com/junegunn/fzf) with git-a
 
 ## Dependencies
 
-**Auto-installed:** [`fzf`](https://github.com/junegunn/fzf) (via `brew` or `git clone`), [`whiptail`](https://linux.die.net/man/1/whiptail) (via `brew`)
+**Auto-installed:** [`fzf`](https://github.com/junegunn/fzf) (via `brew` or `git clone`), [`gum`](https://github.com/charmbracelet/gum) (via `brew`; falls back to [`whiptail`](https://linux.die.net/man/1/whiptail) if already present)
 
 **Optional — enhanced experience:**
 - [`bat`](https://github.com/sharkdp/bat) — syntax-highlighted file previews

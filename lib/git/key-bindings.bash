@@ -13,7 +13,27 @@ bind      '"\C-g\C-t": "$(fzf-git gt)\e\C-e\er"'
 #   "     '"\C-g\C-u"'
 #   "     '"\C-g\C-i"'
 #   "     '"\C-g\C-o"'
-bind      '"\C-g\C-p": " \C-ugit pull\n\C-y\C-h"'
+fzf-git-pull() {
+  if command -v gum > /dev/null; then
+    gum spin --spinner dot --spinner.foreground=109 \
+      --title "Git Pulling..." --title.foreground=240 \
+      -- git pull
+  else
+    git pull
+  fi
+}
+
+fzf-git-push() {
+  if command -v gum > /dev/null; then
+    gum spin --spinner dot --spinner.foreground=109 \
+      --title "Git Pushing..." --title.foreground=240 \
+      -- git push
+  else
+    git push
+  fi
+}
+
+bind      '"\C-g\C-p": " \C-ufzf-git-pull\n\C-y\C-h"'
 # Avail.  '"\C-g\C-["'
 #   "     '"\C-g\C-]"'
 # N/A     '"\C-g\C-\"'
@@ -44,6 +64,6 @@ bind      '"\C-g\C-b": "$(fzf-git gb)\e\C-e\er"'
 # N/A     '"\C-g\C-."'
 bind      '"\C-g\C-_": " \C-ufzf-git\n\C-y\C-h"'
 
-# NOTE:no "\n^y" like the others; both to allow to add extra params, and as a
+# NOTE:no "\n" like the others; both to allow to add extra params, and as a
 # safguard
-bind      '"\C-g\ep": " \C-ugit push \C-h"'
+bind      '"\C-g\ep": " \C-ufzf-git-push "'

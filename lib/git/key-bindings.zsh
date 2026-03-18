@@ -68,6 +68,26 @@ bindkey '^g^v' fzf-grl-widget
 
 unset -f bind-git-helper bind-git-helper-no-join
 
+fzf-git-pull() {
+  if command -v gum > /dev/null; then
+    gum spin --spinner dot --spinner.foreground=109 \
+      --title "Git Pulling..." --title.foreground=240 \
+      -- git pull
+  else
+    git pull
+  fi
+}
+
+fzf-git-push() {
+  if command -v gum > /dev/null; then
+    gum spin --spinner dot --spinner.foreground=109 \
+      --title "Git Pushing..." --title.foreground=240 \
+      -- git push
+  else
+    git push
+  fi
+}
+
 # Avail.   '^g^q'
 # Worktrees'^g^w'
 bindkey -s '^g^e' " ^ufzf-git edit-modified\n^y^h"
@@ -77,7 +97,7 @@ bindkey -s '^g^e' " ^ufzf-git edit-modified\n^y^h"
 #   "      '^g^u'
 #   "      '^g^i'
 #   "      '^g^o'
-bindkey -s '^g^p' " ^ugit pull\n^y^h"
+bindkey -s '^g^p' " ^ufzf-git-pull\n^y^h"
 # Avail.   '^g^['
 #   "      '^g^]'
 # N/A      '^g^\'
@@ -107,4 +127,4 @@ bindkey -s '^g^_' " ^ufzf-git\n^y^h"
 
 # NOTE: no "\n^y" like the others; both to allow to add extra params, and as a
 # safguard
-bindkey -s '^g^[p' " ^ugit push ^h"
+bindkey -s '^g\ep' " ^ufzf-git-push "

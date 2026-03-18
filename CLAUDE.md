@@ -24,7 +24,7 @@ The codebase uses several intentional shellcheck disables:
 - `fzf-configs.plugin.bash` — bash loader: sources `ensure.sh`, `settings.sh`, `key-bindings.bash`, then `lib/git/key-bindings.bash`
 
 **`lib/` files:**
-- `ensure.sh` — installs fzf (via brew or git clone) and whiptail if missing; runs `hash` to refresh PATH cache
+- `ensure.sh` — installs fzf (via brew or git clone) and gum (via brew; falls back to whiptail if already present) if missing; runs `hash` to refresh PATH cache
 - `settings.sh` — sets `FZF_DEFAULT_OPTS`, `FZF_CTRL_T_OPTS`, `FZF_ALT_C_OPTS`, `FZF_TMUX_HEIGHT`; defines `_fzf_compgen_path`/`_fzf_compgen_dir` (fd-based if available); defines `_fzf-configs-completion` (zsh only) for per-command custom completions loaded from `~/.config/fzf-configs/completions/<cmd>.zsh`
 - `key-bindings.zsh` — defines `fzf-src` (ESC-s, ghq-based repo switcher), `fzf-edit-file` (CTRL-O / ESC-o)
 - `key-bindings.bash` — (currently empty, reserved)

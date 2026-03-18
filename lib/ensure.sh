@@ -13,9 +13,9 @@ if ! command -v fzf  > /dev/null; then
   fi
 fi
 
-if ! command -v whiptail  > /dev/null; then
-  if command -v brew      > /dev/null; then
-    brew install newt
+if ! command -v gum > /dev/null && ! command -v whiptail > /dev/null; then
+  if command -v brew > /dev/null; then
+    brew install gum
   fi
 fi
 

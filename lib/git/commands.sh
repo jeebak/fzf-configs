@@ -33,7 +33,15 @@ fzf-down() {
 fzf-git-confirm() {
   local yn
 
-  if qt command -v whiptail; then
+  if qt command -v gum; then
+    gum confirm \
+      --prompt.border=rounded \
+      --prompt.border-foreground=240 \
+      --prompt.margin="1 2" \
+      --prompt.padding="1 4" \
+      --default=false \
+      "$1" < /dev/tty > /dev/tty
+  elif qt command -v whiptail; then
     whiptail --yesno --defaultno "$1" 0 0 > /dev/tty
   else
     yn="$(fzf-git-inputbox "$1 [y|n] ")"
@@ -44,9 +52,34 @@ fzf-git-confirm() {
 }
 
 fzf-git-inputbox() {
-  # Prompt text as $1, w/ optional additional options
-  # shellcheck disable=SC2005
-  echo "$(fzf --prompt "$@" --print-query <<< '')"
+  # Prompt text as $1, w/ optional additional fzf options (-q VALUE for pre-fill)
+  local prompt="$1"; shift
+  local value="" has_preview=""
+  local -a remaining=()
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -q)         value="$2"; shift 2 ;;
+      --preview*) has_preview=1; remaining+=("$1"); shift ;;
+      *)          remaining+=("$1"); shift ;;
+    esac
+  done
+  if [[ -z "$has_preview" ]] && qt command -v gum; then
+    gum input \
+      --prompt "$prompt" \
+      --value "$value" \
+      --prompt.border=rounded \
+      --prompt.border-foreground=240 \
+      --prompt.margin="1 2" \
+      --prompt.padding="1 4" \
+      --prompt.foreground=109 \
+      --cursor.foreground=168 \
+      < /dev/tty
+  else
+    local -a fzf_extra=()
+    [[ -n "$value" ]] && fzf_extra+=(-q "$value")
+    # shellcheck disable=SC2005
+    echo "$(fzf --prompt "$prompt" "${fzf_extra[@]}" "${remaining[@]}" --print-query <<< '')"
+  fi
 }
 
 fzf-git-help() {
@@ -214,7 +247,7 @@ gb() {
   branch=${out[1]}
   if [[ $k == ctrl-* || $k == alt-* ]]; then
     [[ -z "$branch" ]] && return
-    branchlist="\n$(printf '  %s\n' "${out[@]:1}")\n"
+    branchlist=$'\n'"$(printf '  %s\n' "${out[@]:1}")"$'\n'
     case "$k" in
       ctrl-r)
         msg="$(
@@ -325,7 +358,7 @@ gr() {
   remote=${out[1]}
   if [[ $k == ctrl-* || $k == alt-* ]]; then
     [[ -z "$remote" ]] && return
-    remoteslist="\n$(printf '  %s\n' "${out[@]:1}")\n"
+    remoteslist=$'\n'"$(printf '  %s\n' "${out[@]:1}")"$'\n'
     case "$k" in
       alt-p)
         # shellcheck disable=SC2031
