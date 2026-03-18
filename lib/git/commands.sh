@@ -121,13 +121,13 @@ gf() {
       $xf {+f} | tr '\0' '\n' > /tmp/fzf-gf-files
       joined=\$(paste -sd, /tmp/fzf-gf-files | sed 's/,/, /g')
       fzf-git-confirm \"Really commit as [WIP] \$joined?\" &&
-        xargs -0 -a /tmp/fzf-gf-files git commit -m \"[WIP] \$joined\"
+        xargs -d '\n' -a /tmp/fzf-gf-files git commit -m \"[WIP] \$joined\"
       rm -f /tmp/fzf-gf-files
     )+reload($reload_cmd)"
     --bind="ctrl-y:execute(
       $xf {+f} | tr '\0' '\n' > /tmp/fzf-gf-files
       fzf-git-confirm \"Really add+amend --no-edit: \$(sed 's/^/  /' /tmp/fzf-gf-files)?\" &&
-        { xargs -0 -a /tmp/fzf-gf-files git add -- && qt git commit --amend --no-edit; }
+        { xargs -d '\n' -a /tmp/fzf-gf-files git add -- && qt git commit --amend --no-edit; }
       rm -f /tmp/fzf-gf-files
     )+reload($reload_cmd)"
     --preview="(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -$LINES"
@@ -138,7 +138,7 @@ gf() {
       --bind="ctrl-u:execute(
         $xf {+f} | tr '\0' '\n' > /tmp/fzf-gf-files
         fzf-git-confirm \"Really add+amend: \$(sed 's/^/  /' /tmp/fzf-gf-files)?\" && {
-          xargs -0 -a /tmp/fzf-gf-files git add --
+          xargs -d '\n' -a /tmp/fzf-gf-files git add --
           pane_id=\$(tmux split-window -v -P -F '#{pane_id}')
           tmux send-keys -t \"\$pane_id\" 'git commit --amend; tmux wait-for -S amend-done; exit' C-m
           tmux wait-for amend-done
@@ -154,7 +154,7 @@ gf() {
       --bind="ctrl-o:execute(
         $xf {+f} | tr '\0' '\n' > /tmp/fzf-gf-files
         fzf-git-confirm \"Really add+commit: \$(sed 's/^/  /' /tmp/fzf-gf-files)?\" && {
-          xargs -0 -a /tmp/fzf-gf-files git add --
+          xargs -d '\n' -a /tmp/fzf-gf-files git add --
           pane_id=\$(tmux split-window -v -P -F '#{pane_id}')
           tmux send-keys -t \"\$pane_id\" 'git commit; tmux wait-for -S commit-done; exit' C-m
           tmux wait-for commit-done
