@@ -54,16 +54,15 @@ fzf-git-inputbox() {
 }
 
 fzf-git-help() {
-  local cmd
   # mdp displays blank page :/
   # mdv throws unichr error
-# [[ -z "$cmd" ]] && cmd="$(command -v mdp)"
-# [[ -z "$cmd" ]] && cmd="$(command -v mdv)"
-  [[ -z "$cmd" ]] && cmd="$(command -v mdless)"
-  [[ -z "$cmd" ]] && cmd="$(command -v bat)"
-  [[ -z "$cmd" ]] && cmd="$(command -v less)"
-  [[ -z "$cmd" ]] && cmd="$(command -v cat)"
-  "$cmd" "$PLUGIN_D/README.md" < /dev/tty > /dev/tty
+# command -v mdp   &>/dev/null && { mdp   "$PLUGIN_D/README.md" < /dev/tty > /dev/tty; return; }
+# command -v mdv   &>/dev/null && { mdv   "$PLUGIN_D/README.md" < /dev/tty > /dev/tty; return; }
+  command -v glow   &>/dev/null && { glow -p "$PLUGIN_D/README.md" < /dev/tty > /dev/tty; return; }
+  command -v mdless &>/dev/null && { mdless  "$PLUGIN_D/README.md" < /dev/tty > /dev/tty; return; }
+  command -v bat    &>/dev/null && { bat     "$PLUGIN_D/README.md" < /dev/tty > /dev/tty; return; }
+  command -v less   &>/dev/null && { less    "$PLUGIN_D/README.md" < /dev/tty > /dev/tty; return; }
+  cat "$PLUGIN_D/README.md" < /dev/tty > /dev/tty
 }
 
 # -----------------------------------------------------------------------------
