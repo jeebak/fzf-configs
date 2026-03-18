@@ -19,10 +19,6 @@ _pager() {
   fi
 }
 
-# Export the above functions, making them available to fzf's bind execute
-export SHELL=bash
-eval "$(declare -F | sed -e 's/-f /-fx /')"
-
 # Lines of "preview"
 LINES=1000
 
@@ -478,5 +474,9 @@ edit-modified() {
   )
   "${EDITOR:-vim}" "${files[@]}"
 }
+
+# Export all functions above, making them available to fzf's bind execute
+export SHELL=bash
+eval "$(declare -F | sed -e 's/-f /-fx /')"
 
 # vim: set ft=bash:
