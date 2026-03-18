@@ -121,7 +121,7 @@ gf() {
       $xf {+f} | tr '\0' '\n' > /tmp/fzf-gf-files
       joined=\$(paste -sd, /tmp/fzf-gf-files | sed 's/,/, /g')
       fzf-git-confirm \"Really commit as [WIP] \$joined?\" &&
-        xargs -d '\n' -a /tmp/fzf-gf-files git commit -m \"[WIP] \$joined\"
+        { xargs -d '\n' -a /tmp/fzf-gf-files git add -- && git commit -m \"[WIP] \$joined\" ; }
       rm -f /tmp/fzf-gf-files
     )+reload($reload_cmd)"
     --bind="ctrl-y:execute(
