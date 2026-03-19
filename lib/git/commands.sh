@@ -423,7 +423,11 @@ gs() {
       --prompt="$prompt" \
       --bind="enter:execute(_pager git stash show --color=always -p \$(cut -d' ' -f1 <<< {}))" \
       --bind="ctrl-d:execute(_pager git diff --color=always --stat -p \$(cut -d' ' -f1 <<< {}))" \
-      --bind="ctrl-x:execute-silent(git stash drop \$(cut -d' ' -f1 <<< {}))+reload($reload_cmd)" \
+      --bind="ctrl-x:execute(
+        stash=\$(cut -d' ' -f1 <<< {})
+        fzf-git-confirm \"Really drop: \${stash}?\" &&
+          git stash drop \"\$stash\"
+      )+reload($reload_cmd)" \
       --bind="ctrl-o:execute(git stash pop \$(cut -d' ' -f1 <<< {}) | _pager)+reload($reload_cmd)" \
       --bind="ctrl-y:execute-silent(git stash apply \$(cut -d' ' -f1 <<< {}))" \
       --bind="alt-b:execute(
