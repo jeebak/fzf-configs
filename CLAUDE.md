@@ -28,9 +28,9 @@ The codebase uses several intentional shellcheck disables:
 - `settings.sh` — sets `FZF_DEFAULT_OPTS`, `FZF_CTRL_T_OPTS`, `FZF_ALT_C_OPTS`, `FZF_TMUX_HEIGHT`; defines `_fzf_compgen_path`/`_fzf_compgen_dir` (fd-based if available); defines `_fzf-configs-completion` (zsh only) for per-command custom completions loaded from `~/.config/fzf-configs/completions/<cmd>.zsh`
 - `key-bindings.zsh` — defines `fzf-src` (ESC-s, ghq-based repo switcher), `fzf-edit-file` (CTRL-O / ESC-o)
 - `key-bindings.bash` — (currently empty, reserved)
-- `git/commands.sh` — defines all git functions: `gf` (files/status), `gb` (branches), `gt` (tags), `gh` (hashes/log), `gr` (remotes), `ga` (aliases), `gl` (log browser), `gs` (stashes), `edit-modified`; also exports these functions to subshells via `eval "$(declare -F | sed -e 's/-f /-fx /')"`
-- `git/key-bindings.zsh` — binds `^G^F/B/T/R/H/L/A/S` to the git functions via `bind-git-helper`; also binds `^G^D` (git diff), `^G^G` (git status), `^G^P` (git pull), `^G^[P` (git push), `^G^E` (edit-modified), `^G^/` (help), `^G^_` (fzf-git menu)
-- `git/key-bindings.bash` — (currently empty, reserved)
+- `git/commands.sh` — defines all git functions: `gf` (files/status), `gb` (branches), `gt` (tags), `gh` (hashes/log), `gr` (remotes), `ga` (aliases), `gl` (log browser), `gs` (stashes), `gw` (worktrees), `grl` (reflog), `edit-modified`; also exports these functions to subshells via `eval "$(declare -F | sed -e 's/-f /-fx /')"`
+- `git/key-bindings.zsh` — binds `^G^F/B/T/R/H/L/A/W` via `bind-git-helper` (output inserted on command line) and `^G^S` via `bind-git-helper-no-join` (interactive browser, no output); `^G^V` (reflog) bound via a manually defined widget; also binds `^G^D` (git diff), `^G^G` (git status), `^G^P` (git pull), `^G^[P` (git push), `^G^E` (edit-modified), `^G^_` (fzf-git menu); `^GH`/`^GL` provide alternate bindings for tmux users who map `^{h,l}` to pane navigation
+- `git/key-bindings.bash` — mirrors `key-bindings.zsh` using readline `bind` commands; output-producing functions use `"$(fzf-git gX)\e\C-e\er"`, interactive-only functions (gs, edit-modified, pull, git diff/status) use `" \C-ufzf-git gX\n\C-y\C-h"`
 
 **`libexec/` scripts** (internal helpers, not added to PATH):
 - `key-bindings-help` — prints the keybindings from `FZF_DEFAULT_OPTS`; invoked via full path (`$PLUGIN_D/libexec/key-bindings-help`) in `--bind` execute strings
@@ -46,4 +46,4 @@ The codebase uses several intentional shellcheck disables:
 
 **Custom completions** (zsh only): drop a file at `~/.config/fzf-configs/completions/<cmd>.zsh`; it must use `$fzf` variable and set `$matches`. The `$query` variable holds the current token.
 
-**TMUX-aware actions:** Several `gf` actions (ctrl-u amend, ctrl-e edit, ctrl-o commit, ctrl-p add -p) only appear when `$TMUX` is set, opening a tmux split-pane for interactive git operations.
+**TMUX-aware actions:** Several `gf` actions (ctrl-u amend, ctrl-e edit, ctrl-o commit, ctrl-p add -p) only appear when `$TMUX` is set, opening a `tmux new-window` for interactive git operations.
