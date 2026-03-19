@@ -39,7 +39,7 @@ bind      '"\C-g\C-p": " \C-ufzf-git-pull\n\C-y\C-h"'
 # N/A     '"\C-g\C-\"'
 
 bind      '"\C-g\C-a": "$(fzf-git ga)\e\C-e\er"'
-bind      '"\C-g\C-s": "$(fzf-git gs)\e\C-e\er"'
+bind      '"\C-g\C-s": " \C-ufzf-git gs\n\C-y\C-h"'
 bind      '"\C-g\C-d": " \C-ugit diff\n\C-y\C-h"'
 bind      '"\C-g\C-f": "$(fzf-git gf)\e\C-e\er"'
 bind      '"\C-g\C-g": " \C-ugit status\n\C-y\C-h"'
