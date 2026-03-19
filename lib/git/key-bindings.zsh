@@ -4,7 +4,7 @@
 bind-git-helper() {
   local c
   for c in "$@"; do
-    eval "fzf-g$c-widget() {
+    eval "__fzf-configs::g$c-widget() {
       # shellcheck disable=SC2154
       local result=\$(fzf-git g$c | while read -r item; do echo -n \"\${(q)item} \"; done)
       local buffer=\$BUFFER
@@ -17,10 +17,10 @@ bind-git-helper() {
         print -z \"\$buffer\"
       fi
     }
-    zle -N fzf-g$c-widget
+    zle -N __fzf-configs::g$c-widget
     [[ \$FZF_CONFIGS_NO_CONTROL = true ]] &&
-      bindkey '^g$c'  fzf-g$c-widget ||
-      bindkey '^g^$c' fzf-g$c-widget"
+      bindkey '^g$c'  __fzf-configs::g$c-widget ||
+      bindkey '^g^$c' __fzf-configs::g$c-widget"
   done
 }
 
@@ -31,18 +31,18 @@ FZF_CONFIGS_NO_CONTROL=true bind-git-helper h j k l
 bind-git-helper-no-join() {
   local c
   for c in "$@"; do
-    eval "fzf-g$c-widget() {
+    eval "__fzf-configs::g$c-widget() {
       fzf-git g$c
       zle accept-line
     }
-    zle -N fzf-g$c-widget
-    bindkey '^g^$c' fzf-g$c-widget"
+    zle -N __fzf-configs::g$c-widget
+    bindkey '^g^$c' __fzf-configs::g$c-widget"
   done
 }
 
 bind-git-helper-no-join s
 
-fzf-grl-widget() {
+__fzf-configs::grl-widget() {
   local result
   # shellcheck disable=SC2034,SC2296
   result=$(fzf-git grl | while read -r item; do echo -n "${(q)item} "; done)
@@ -57,12 +57,12 @@ fzf-grl-widget() {
     print -z "$buffer"
   fi
 }
-zle -N fzf-grl-widget
-bindkey '^g^v' fzf-grl-widget
+zle -N __fzf-configs::grl-widget
+bindkey '^g^v' __fzf-configs::grl-widget
 
 unset -f bind-git-helper bind-git-helper-no-join
 
-fzf-git-pull() {
+__fzf-configs::git-pull() {
   if command -v gum > /dev/null; then
     gum spin --spinner dot --spinner.foreground=109 \
       --title "Git Pulling..." --title.foreground=240 \
@@ -72,7 +72,7 @@ fzf-git-pull() {
   fi
 }
 
-fzf-git-push() {
+__fzf-configs::git-push() {
   if command -v gum > /dev/null; then
     gum spin --spinner dot --spinner.foreground=109 \
       --title "Git Pushing..." --title.foreground=240 \
@@ -91,7 +91,7 @@ bindkey -s '^g^e' " ^ufzf-git edit-modified\n^y^h"
 #   "      '^g^u'
 #   "      '^g^i'
 #   "      '^g^o'
-bindkey -s '^g^p' " ^ufzf-git-pull\n^y^h"
+bindkey -s '^g^p' " ^u__fzf-configs::git-pull\n^y^h"
 # Avail.   '^g^['
 #   "      '^g^]'
 # N/A      '^g^\'
@@ -121,4 +121,4 @@ bindkey -s '^g^_' " ^ufzf-git\n^y^h"
 
 # NOTE: no "\n^y" like the others; both to allow to add extra params, and as a
 # safguard
-bindkey -s '^g\ep' " ^ufzf-git-push "
+bindkey -s '^g\ep' " ^u__fzf-configs::git-push "

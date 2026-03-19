@@ -7,7 +7,7 @@ bindkey -s '\em' " ^ufzlp\n^y"
 
 # Based on: http://weblog.bulknews.net/post/89635306479/ghq-peco-percol
 #      and: https://gist.github.com/junegunn/f4fca918e937e6bf5bad
-fzf-src () {
+__fzf-configs::src () {
   local out selected_dir
 
   echo "Gathering list..."
@@ -28,11 +28,11 @@ fzf-src () {
   zle clear-screen
 }
 
-zle -N fzf-src
-bindkey '\es' fzf-src
+zle -N __fzf-configs::src
+bindkey '\es' __fzf-configs::src
 
 # Inspired by fzf docs
-fzf-edit-file() {
+__fzf-configs::edit-file() {
   local out
 
   echo "Gathering list..."
@@ -51,8 +51,8 @@ fzf-edit-file() {
   zle redisplay
 }
 
-zle     -N   fzf-edit-file
-bindkey '^o' fzf-edit-file
-bindkey '\eo' fzf-edit-file
+zle     -N   __fzf-configs::edit-file
+bindkey '^o' __fzf-configs::edit-file
+bindkey '\eo' __fzf-configs::edit-file
 
 # vim: set ft=zsh:
