@@ -200,104 +200,80 @@ gf() {
 
 gb() {
   is_in_git_repo || return
-  local header prompt expect out branch yn msg branchlist parts
+  local header prompt reload_cmd
 
   header="📝: ^r:rename,^w:new,^o:checkout,^x:delete,alt-m:merge,alt-o:open"
   prompt="  👀: ^s:log ..b,^d:diff,^f:log b..,^n:log --n-s,^p:log -p,?:help: "
-  expect="ctrl-r,ctrl-w,ctrl-o,ctrl-x,alt-m"
+  reload_cmd="git branch -a --color=always | grep -v '/HEAD\s' | sort"
 
-  # shellcheck disable=SC2207
-  out=($(
-    git branch -a --color=always | grep -v '/HEAD\s' | sort |
-    fzf --ansi --multi --tac --border --border-label=" git branches " \
-      --header="$header" \
-      --prompt="$prompt" \
-      --expect="$expect" \
-      --bind="ctrl-s:execute: _pager git log --color=always --stat \
-        -p ..\$(sed s'/* //' <<< {1})" \
-      --bind="ctrl-d:execute: _pager git diff --color=always --stat \
-        -p \$(sed s'/* //' <<< {1})" \
-      --bind="ctrl-f:execute: _pager git log --color=always --stat \
-        -p \$(sed s'/* //' <<< {1}).." \
-      --bind="ctrl-n:execute: _pager git log --color=always --stat \
-        --name-status \$(sed s'/* //' <<< {})" \
-      --bind="ctrl-p:execute: _pager git log --color=always --stat \
-        -p \$(sed s'/* //' <<< {})" \
-      --bind="alt-o:execute-silent(
-        branch=\$(sed 's/\x1b\[[0-9;]*m//g' <<< {-1} | sed 's|^remotes/[^/]*/||')
-        remote=\$(git config \"branch.\$branch.remote\" 2>/dev/null || echo origin)
-        remote_url=\$(git remote get-url \"\$remote\" 2>/dev/null ||
-          git remote get-url origin 2>/dev/null)
-        [[ -z \"\$remote_url\" ]] && exit 0
-        url=\${remote_url%.git}; url=\${url#git@}; url=https://\${url/://}
-        xdg-open \"\$url/tree/\$branch\" 2>/dev/null ||
-          open \"\$url/tree/\$branch\" 2>/dev/null
-      )" \
-      --preview="git log --color=always --oneline --graph --date=short \
-        --pretty='format:%C(auto)%cd %h%d %s' \
-        \$(sed s/^..// <<< {} | cut -d' ' -f1) | head -$LINES" |
-    sed 's/^\(alt-.\)/  \1/;s/^\(ctrl-.\)/  \1/' |
-      sed 's/^..//' | cut -d' ' -f1
-  ))
-  k=${out[0]}
-  branch=${out[1]}
-  if [[ $k == ctrl-* || $k == alt-* ]]; then
-    [[ -z "$branch" ]] && return
-    branchlist=$'\n'"$(printf '  %s\n' "${out[@]:1}")"$'\n'
-    case "$k" in
-      ctrl-r)
-        msg="$(
-          reo git branch -m "$branch" \
-            "$(fzf-git-inputbox 'Enter a branchname: ' -q "$branch")"
-        )"
-        ;;
-      ctrl-w)
-        msg="$(
-          reo git checkout -b "$(fzf-git-inputbox 'Enter a branchname: ')" \
-            "$branch"
-        )"
-        ;;
-      ctrl-o)
-        msg="$(reo git stash)"
-        # shellcheck disable=SC2001
-        branch="$(sed 's#^remotes/[^/][^/]*/##' <<< "$branch")"
-        if git show-ref --verify --quiet "refs/heads/$branch"; then
-          msg="${msg}\n\n$(reo git checkout    "$branch")"
+  git branch -a --color=always | grep -v '/HEAD\s' | sort |
+  fzf --ansi --multi --tac --border --border-label=" git branches " \
+    --header="$header" \
+    --prompt="$prompt" \
+    --bind="ctrl-s:execute(_pager git log --color=always --stat \
+      -p ..\$(sed 's/\x1b\[[0-9;]*m//g;s/^[* ]*//' <<< {} | cut -d' ' -f1))" \
+    --bind="ctrl-d:execute(_pager git diff --color=always --stat \
+      -p \$(sed 's/\x1b\[[0-9;]*m//g;s/^[* ]*//' <<< {} | cut -d' ' -f1))" \
+    --bind="ctrl-f:execute(_pager git log --color=always --stat \
+      -p \$(sed 's/\x1b\[[0-9;]*m//g;s/^[* ]*//' <<< {} | cut -d' ' -f1)..)" \
+    --bind="ctrl-n:execute(_pager git log --color=always --stat \
+      --name-status \$(sed 's/\x1b\[[0-9;]*m//g;s/^[* ]*//' <<< {} | cut -d' ' -f1))" \
+    --bind="ctrl-p:execute(_pager git log --color=always --stat \
+      -p \$(sed 's/\x1b\[[0-9;]*m//g;s/^[* ]*//' <<< {} | cut -d' ' -f1))" \
+    --bind="alt-o:execute-silent(
+      branch=\$(sed 's/\x1b\[[0-9;]*m//g' <<< {-1} | sed 's|^remotes/[^/]*/||')
+      remote=\$(git config \"branch.\$branch.remote\" 2>/dev/null || echo origin)
+      remote_url=\$(git remote get-url \"\$remote\" 2>/dev/null ||
+        git remote get-url origin 2>/dev/null)
+      [[ -z \"\$remote_url\" ]] && exit 0
+      url=\${remote_url%.git}; url=\${url#git@}; url=https://\${url/://}
+      xdg-open \"\$url/tree/\$branch\" 2>/dev/null ||
+        open \"\$url/tree/\$branch\" 2>/dev/null
+    )" \
+    --bind="ctrl-r:execute(
+      branch=\$(sed 's/\x1b\[[0-9;]*m//g;s/^[* ]*//' <<< {} | cut -d' ' -f1)
+      newname=\$(fzf-git-inputbox 'Enter a branchname: ' -q \"\$branch\")
+      [[ -n \"\$newname\" ]] && reo git branch -m \"\$branch\" \"\$newname\"
+    )+reload($reload_cmd)" \
+    --bind="ctrl-w:execute(
+      branch=\$(sed 's/\x1b\[[0-9;]*m//g;s/^[* ]*//' <<< {} | cut -d' ' -f1)
+      newname=\$(fzf-git-inputbox 'Enter a branchname: ')
+      [[ -n \"\$newname\" ]] && reo git checkout -b \"\$newname\" \"\$branch\"
+    )+reload($reload_cmd)" \
+    --bind="ctrl-o:execute(
+      branch=\$(sed 's/\x1b\[[0-9;]*m//g;s/^[* ]*//' <<< {} | cut -d' ' -f1 |
+        sed 's#^remotes/[^/][^/]*/##')
+      reo git stash
+      if git show-ref --verify --quiet \"refs/heads/\$branch\"; then
+        reo git checkout    \"\$branch\"
+      else
+        reo git checkout -b \"\$branch\"
+      fi
+    )+reload($reload_cmd)" \
+    --bind="ctrl-x:execute(
+      mapfile -t branches < <(sed 's/\x1b\[[0-9;]*m//g;s/^[* ]*//' {+f} | cut -d' ' -f1)
+      branchlist=\$'\n'\"\$(printf '  %s\n' \"\${branches[@]}\")\"\$'\n'
+      fzf-git-confirm \"Really delete: \${branchlist}?\" || exit 0
+      for branch in \"\${branches[@]}\"; do
+        if [[ \$branch == remotes/* ]]; then
+          IFS='/' read -r -a parts <<< \"\$branch\"
+          # shellcheck disable=SC2124
+          bname=\"\${parts[@]:2}\"
+          reo git push \"\${parts[1]}\" --delete \"\${bname// //}\"
         else
-          msg="${msg}\n\n$(reo git checkout -b "$branch")"
+          reo git branch -D \"\$branch\"
         fi
-        ;;
-      ctrl-x)
-        if fzf-git-confirm "Really delete: ${branchlist}?"; then
-          for branch in "${out[@]:1}"; do
-            if [[ $branch == remotes/* ]]; then
-              IFS='/' read -r -a parts <<< "$branch"
-              # shellcheck disable=SC2030,2124
-              branch="${parts[@]:2}" # Branch names with /'s
-              msg="${msg}\n$(
-                reo git push "${parts[1]}" --delete "${branch// //}"
-              )"
-            else
-              msg="${msg}\n$(
-                reo git branch -D "$branch"
-              )"
-            fi
-          done
-        fi
-        ;;
-      alt-m)
-        # shellcheck disable=SC2031
-        if fzf-git-confirm "Really merge: ${branch}?"; then
-          msg="${msg}\n$(reo git merge --stat "$branch")"
-        fi
-        ;;
-    esac
-    [[ -n "$msg" ]] && echo -e "$msg" | _pager
-    return
-  fi
-  if [[ ${#out[@]} -gt 0 ]]; then
-    printf '%s\n' "${out[@]}" | sed 's#^remotes/##'
-  fi
+      done
+    )+reload($reload_cmd)" \
+    --bind="alt-m:execute(
+      branch=\$(sed 's/\x1b\[[0-9;]*m//g;s/^[* ]*//' <<< {} | cut -d' ' -f1)
+      fzf-git-confirm \"Really merge: \${branch}?\" &&
+        reo git merge --stat \"\$branch\"
+    )+reload($reload_cmd)" \
+    --preview="git log --color=always --oneline --graph --date=short \
+      --pretty='format:%C(auto)%cd %h%d %s' \
+      \$(sed 's/\x1b\[[0-9;]*m//g;s/^[* ]*//' <<< {} | cut -d' ' -f1) | head -$LINES" |
+  sed 's/\x1b\[[0-9;]*m//g;s/^[* ]*//' | cut -d' ' -f1 | sed 's#^remotes/##'
 }
 
 gt() {
