@@ -26,10 +26,10 @@ The codebase uses several intentional shellcheck disables:
 **`lib/` files:**
 - `ensure.sh` — installs fzf (via brew or git clone) and gum (via brew; falls back to whiptail if already present) if missing; runs `hash` to refresh PATH cache
 - `settings.sh` — sets `FZF_DEFAULT_OPTS`, `FZF_CTRL_T_OPTS`, `FZF_ALT_C_OPTS`, `FZF_TMUX_HEIGHT`; defines `_fzf_compgen_path`/`_fzf_compgen_dir` (fd-based if available); defines `_fzf-configs-completion` (zsh only) for per-command custom completions loaded from `~/.config/fzf-configs/completions/<cmd>.zsh`
-- `key-bindings.zsh` — defines `fzf-src` (ESC-s, ghq-based repo switcher), `fzf-edit-file` (CTRL-O / ESC-o)
+- `key-bindings.zsh` — defines `__fzf-configs::src` (ESC-s, ghq-based repo switcher), `__fzf-configs::edit-file` (CTRL-O / ESC-o)
 - `key-bindings.bash` — (currently empty, reserved)
 - `git/commands.sh` — defines all git functions: `gf` (files/status), `gb` (branches), `gt` (tags), `gh` (hashes/log), `gr` (remotes), `ga` (aliases), `gl` (log browser), `gs` (stashes), `gw` (worktrees), `grl` (reflog), `edit-modified`; also exports these functions to subshells via `eval "$(declare -F | sed -e 's/-f /-fx /')"`
-- `git/key-bindings.zsh` — binds `^G^F/B/T/R/H/L/A/W` via `bind-git-helper` (output inserted on command line) and `^G^S` via `bind-git-helper-no-join` (interactive browser, no output); `^G^V` (reflog) bound via a manually defined widget; also binds `^G^D` (git diff), `^G^G` (git status), `^G^P` (git pull), `^G^[P` (git push), `^G^E` (edit-modified), `^G^_` (fzf-git menu); `^GH`/`^GL` provide alternate bindings for tmux users who map `^{h,l}` to pane navigation
+- `git/key-bindings.zsh` — binds `^G^F/B/T/R/H/L/A/W` via `bind-git-helper` (output inserted on command line) and `^G^S` via `bind-git-helper-no-join` (interactive browser, no output); `^G^V` (reflog) bound via a manually defined widget; also binds `^G^D` (git diff), `^G^G` (git status), `^G^P` (git pull), `^G^[P` (git push), `^G^E` (edit-modified), `^G^_` (fzf-git menu); `^GH`/`^GL` provide alternate bindings for tmux users who map `^{h,l}` to pane navigation; all persistent shell functions use the `__fzf-configs::` namespace prefix (e.g. `__fzf-configs::git-pull`, `__fzf-configs::gf-widget`)
 - `git/key-bindings.bash` — mirrors `key-bindings.zsh` using readline `bind` commands; output-producing functions use `"$(fzf-git gX)\e\C-e\er"`, interactive-only functions (gs, edit-modified, pull, git diff/status) use `" \C-ufzf-git gX\n\C-y\C-h"`
 
 **`libexec/` scripts** (internal helpers, not added to PATH):
