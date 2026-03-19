@@ -1,20 +1,12 @@
 #!/usr/bin/env ksh
 # NOTE: the "ksh" is just to make shellcheck happy
 
-join-lines() {
-  local item
-  # shellcheck disable=SC2034
-  while read -r item; do
-    # shellcheck disable=SC2154
-    echo -n "${(q)item} "
-  done
-}
-
 bind-git-helper() {
   local c
   for c in "$@"; do
     eval "fzf-g$c-widget() {
-      local result=\$(fzf-git g$c | join-lines)
+      # shellcheck disable=SC2154
+      local result=\$(fzf-git g$c | while read -r item; do echo -n \"\${(q)item} \"; done)
       local buffer=\$BUFFER
       zle reset-prompt
       if [[ -n \$result ]]; then
@@ -52,7 +44,9 @@ bind-git-helper-no-join s
 
 fzf-grl-widget() {
   local result
-  result=$(fzf-git grl | join-lines)
+  # shellcheck disable=SC2034,SC2296
+  result=$(fzf-git grl | while read -r item; do echo -n "${(q)item} "; done)
+  # shellcheck disable=SC2153
   local buffer=$BUFFER
   zle reset-prompt
   if [[ -n $result ]]; then
