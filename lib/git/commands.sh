@@ -30,6 +30,10 @@ fzf-down() {
   fzf --height 50% "$@" --border
 }
 
+tmux-popup() {
+  tmux display-popup -E -d '#{pane_current_path}' -w 90% -h 70% "$@"
+}
+
 fzf-git-confirm() {
   local yn
 
@@ -152,12 +156,12 @@ gf() {
       files=\$($xf {+f} | tr '\0' '\n')
       joined=\$(echo \"\$files\" | paste -sd, | sed 's/,/, /g')
       fzf-git-confirm \"Really commit as [WIP] \$joined?\" &&
-        { echo \"\$files\" | xargs -d '\n' git add -- && git commit -m \"[WIP] \$joined\" ; }
+        { echo \"\$files\" | tr '\n' '\0' | xargs -0 git add -- && git commit -m \"[WIP] \$joined\" ; }
     )+reload($reload_cmd)"
     --bind="ctrl-y:execute(
       files=\$($xf {+f} | tr '\0' '\n')
       fzf-git-confirm \"Really add+amend --no-edit: \$(echo \"\$files\" | sed 's/^/  /')?\" &&
-        { echo \"\$files\" | xargs -d '\n' git add -- && qt git commit --amend --no-edit; }
+        { echo \"\$files\" | tr '\n' '\0' | xargs -0 git add -- && qt git commit --amend --no-edit; }
     )+reload($reload_cmd)"
     --preview="(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -$LINES"
   )
@@ -167,32 +171,24 @@ gf() {
       --bind="ctrl-u:execute(
         files=\$($xf {+f} | tr '\0' '\n')
         fzf-git-confirm \"Really add+amend: \$(echo \"\$files\" | sed 's/^/  /')?\" && {
-          echo \"\$files\" | xargs -d '\n' git add --
-          pane_id=\$(tmux split-window -v -P -F '#{pane_id}')
-          tmux send-keys -t \"\$pane_id\" 'git commit --amend; tmux wait-for -S amend-done; exit' C-m
-          tmux wait-for amend-done
+          echo \"\$files\" | tr '\n' '\0' | xargs -0 git add --
+          tmux-popup 'git commit --amend'
         }
       )+reload($reload_cmd)"
       --bind="ctrl-e:execute(
         files=\$($xf {+f} | tr '\0' '\n')
-        pane_id=\$(tmux split-window -v -P -F '#{pane_id}')
-        tmux send-keys -t \"\$pane_id\" \"\${EDITOR:-vim} \$(echo \"\$files\" | xargs); tmux wait-for -S edit-done; exit\" C-m
-        tmux wait-for edit-done
+        tmux-popup \"\${EDITOR:-vim} \$(echo \"\$files\" | tr '\n' '\0' | xargs -0)\"
       )+reload($reload_cmd)"
       --bind="ctrl-o:execute(
         files=\$($xf {+f} | tr '\0' '\n')
         fzf-git-confirm \"Really add+commit: \$(echo \"\$files\" | sed 's/^/  /')?\" && {
-          echo \"\$files\" | xargs -d '\n' git add --
-          pane_id=\$(tmux split-window -v -P -F '#{pane_id}')
-          tmux send-keys -t \"\$pane_id\" 'git commit; tmux wait-for -S commit-done; exit' C-m
-          tmux wait-for commit-done
+          echo \"\$files\" | tr '\n' '\0' | xargs -0 git add --
+          tmux-popup 'git commit'
         }
       )+reload($reload_cmd)"
       --bind="ctrl-p:execute(
         files=\$($xf {+f} | tr '\0' '\n')
-        pane_id=\$(tmux split-window -v -P -F '#{pane_id}')
-        tmux send-keys -t \"\$pane_id\" \"git add -p \$(echo \"\$files\" | xargs); tmux wait-for -S add-p-done; exit\" C-m
-        tmux wait-for add-p-done
+        tmux-popup \"git add -p \$(echo \"\$files\" | tr '\n' '\0' | xargs -0)\"
       )+reload($reload_cmd)"
     )
   fi
