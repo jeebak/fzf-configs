@@ -202,7 +202,7 @@ gb() {
   is_in_git_repo || return
   local header prompt reload_cmd
 
-  header="📝: ^r:rename,^w:new,^o:checkout,^x:delete,alt-m:merge,alt-o:open"
+  header="📝: ^r:rename,^w:new,^o:checkout,^e:checkout+reload,^x:delete,alt-m:merge,alt-o:open"
   prompt="  👀: ^s:log ..b,^d:diff,^f:log b..,^n:log --n-s,^p:log -p,?:help: "
   reload_cmd="git branch -a --color=always | grep -v '/HEAD\s' | sort"
 
@@ -241,6 +241,16 @@ gb() {
       [[ -n \"\$newname\" ]] && reo git checkout -b \"\$newname\" \"\$branch\"
     )+reload($reload_cmd)" \
     --bind="ctrl-o:execute(
+      branch=\$(sed 's/\x1b\[[0-9;]*m//g;s/^[* ]*//' <<< {} | cut -d' ' -f1 |
+        sed 's#^remotes/[^/][^/]*/##')
+      reo git stash
+      if git show-ref --verify --quiet \"refs/heads/\$branch\"; then
+        reo git checkout    \"\$branch\"
+      else
+        reo git checkout -b \"\$branch\"
+      fi
+    )+abort" \
+    --bind="ctrl-e:execute(
       branch=\$(sed 's/\x1b\[[0-9;]*m//g;s/^[* ]*//' <<< {} | cut -d' ' -f1 |
         sed 's#^remotes/[^/][^/]*/##')
       reo git stash
