@@ -46,4 +46,4 @@ The codebase uses several intentional shellcheck disables:
 
 **Custom completions** (zsh only): drop a file at `~/.config/fzf-configs/completions/<cmd>.zsh`; it must use `$fzf` variable and set `$matches`. The `$query` variable holds the current token.
 
-**TMUX-aware actions:** Several `gf` actions (ctrl-u amend, ctrl-e edit, ctrl-o commit, ctrl-p add -p) only appear when `$TMUX` is set, opening a `tmux new-window` for interactive git operations.
+**TMUX-aware popup:** `fzf-git-base()` adds `--tmux "WxH"` when `$TMUX` is set, opening all git browsers as tmux popups (inspired by junegunn/fzf-git.sh). Width and height are computed from `#{client_width}`/`#{client_height}` at 90%, capped at 180 cols × 60 rows. The `gf()` ctrl-u/ctrl-e/ctrl-o/ctrl-p bindings are always available regardless of tmux.
