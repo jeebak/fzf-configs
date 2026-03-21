@@ -65,3 +65,4 @@ bind      '"\C-g\C-b": "$(fzf-git gb)\e\C-e\er"'
 bind      '"\C-g\C-_": " \C-ufzf-git\n\C-y\C-h"'
 
 bind -x   '"\C-g\ep": __fzf-configs::git-push'
+bind      '"\C-g?":  " \C-ufzf-git g?\n\C-y\C-h"'

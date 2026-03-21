@@ -490,6 +490,63 @@ edit-modified() {
   "${EDITOR:-vim}" "${files[@]}"
 }
 
+g?() {
+  # This script started out as a fork of:
+  #   https://github.com/hankchanocd/git-commands
+  #
+  # Based on `git help -a` provided by `hub`, show all the available git
+  # commands, both native and custom.
+  #
+  # git help -a
+  #   Ref: https://stackoverflow.com/questions/7866353/git-list-all-available-commands
+  local help_options='-a'
+  git help --no-verbose > /dev/null 2>&1 && help_options='--no-verbose -a'
+
+  local git_help_all dividing_line_number whole_line_number
+  # shellcheck disable=SC2086
+  git_help_all=$(git help $help_options)
+  dividing_line_number=$(
+    grep -n "git commands available from elsewhere on your \$PATH" \
+      <<< "$git_help_all" | sed 's/[^0-9]*//g'
+  )
+  whole_line_number=$(wc -l <<< "$git_help_all")
+
+  local blue white reset
+  blue="$(tput setaf 4)"; white="$(tput setaf 7)"; reset="$(tput sgr0)"
+
+  local commands
+  commands=$(
+    {
+      while read -r line; do
+        echo -e "${white}${line}${reset}"
+      done < <(
+        head -n "$dividing_line_number" <<< "$git_help_all" |
+          grep "^  [a-z]" | tr ' ' '\n' | grep -v "^$"
+      )
+      while read -r line; do
+        echo -e "${blue}${line}${reset}"
+      done < <(
+        tail -n $((whole_line_number - dividing_line_number)) <<< "$git_help_all" |
+          grep "^  [a-z]" | tr ' ' '\n' | grep -v "^$"
+      )
+    } | sort -u -k 1.6
+  )
+
+  local result
+  # shellcheck disable=SC2030
+  while result=$(
+    fzf-git-base "🔧 Commands" --reverse --cycle \
+      --header="Preview: alt-j:↓,alt-k:↑,^f:pg↓,^b:pg↑" \
+      --bind "alt-j:preview-down,alt-k:preview-up,ctrl-f:preview-page-down,ctrl-b:preview-page-up" \
+      --preview-window=right:75% \
+      --preview="COLUMNS=$(( $(tput cols) * 3/4 )) git help git-{} || {
+        echo && (cd /tmp && git-{} -h 2> /dev/null)
+      }" <<< "$commands"
+  ); do
+    [[ -n "$result" ]] && git help "$result"
+  done
+}
+
 # Export all functions above, making them available to fzf's bind execute
 export SHELL=bash
 eval "$(declare -F | sed -e 's/-f /-fx /')"

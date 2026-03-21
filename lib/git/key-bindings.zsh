@@ -124,3 +124,4 @@ bindkey -s '^g^g' " ^ugit status\n^y^h"
 bindkey -s '^g^_' " ^ufzf-git\n^y^h"
 
 bindkey    '^g\ep' __fzf-configs::git-push-widget
+bindkey -s '^g?'   " ^ufzf-git g?\n^y^h"
