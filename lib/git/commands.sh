@@ -26,10 +26,24 @@ is_in_git_repo() {
   git rev-parse HEAD > /dev/null 2>&1
 }
 
-fzf-down() {
-  fzf --height 50% "$@" --border
+# --tmux usage inspired by junegunn/fzf-git.sh
+fzf-git-base() {
+  local label="$1"; shift
+  local -a tmux_opt=()
+  if [[ -n "$TMUX" ]]; then
+    local w h max_w max_h
+    max_w=180
+    max_h=60
+    w=$(( $(tmux display-message -p '#{client_width}') * 9 / 10 ))
+    h=$(( $(tmux display-message -p '#{client_height}') * 9 / 10 ))
+    (( w > max_w )) && w=$max_w
+    (( h > max_h )) && h=$max_h
+    tmux_opt=(--tmux "$w,$h")
+  fi
+  fzf --ansi --border --border-label=" $label " "${tmux_opt[@]}" "$@"
 }
 
+# Kept for posterity; no longer called by any binding.
 tmux-popup() {
   tmux display-popup -E -d '#{pane_current_path}' -w 90% -h 70% "$@"
 }
@@ -112,18 +126,16 @@ gf() {
   local -a fzf_opts
 
   header="📝: ^a:add,^r:revert,^s:stash,^x:rm,^t:wip,^y:amend-no-edit"
-  prompt="  👀: ^d:diff,^w:word-diff,^h:history {},^n:log --n-s,^l:log -p,alt-t:toggle-all,?:help: "
+  header="$header,^u:amend,^e:edit,^o:commit,^p:add -p"
+  prompt="  👀: ^d:diff,^w:word-diff,^h:history {},^n:log --n-s,^l:log -p"
+  prompt="$prompt,alt-t:toggle-all,?:help: "
   reload_cmd="git -c color.status=always status --short"
   # Helper: extract null-delimited filenames from a git status {+f} temp file,
   # write newline-delimited copy to a scratch file, and echo that scratch path.
   xf="$PLUGIN_D/libexec/git-status-files"
 
-  if [[ -n "$TMUX" ]]; then
-    header="$header,^u:amend,^e:edit,^o:commit,^p:add -p"
-  fi
-
   fzf_opts=(
-    -m --ansi "--nth=2..,.." --border --border-label=" git status "
+    -m "--nth=2..,.."
     --header="$header"
     --prompt="$prompt"
     --bind="alt-t:toggle-all"
@@ -163,38 +175,33 @@ gf() {
       fzf-git-confirm \"Really add+amend --no-edit: \$(echo \"\$files\" | sed 's/^/  /')?\" &&
         { echo \"\$files\" | tr '\n' '\0' | xargs -0 git add -- && qt git commit --amend --no-edit; }
     )+reload($reload_cmd)"
+    --bind="ctrl-u:execute(
+      files=\$($xf {+f} | tr '\0' '\n')
+      fzf-git-confirm \"Really add+amend: \$(echo \"\$files\" | sed 's/^/  /')?\" && {
+        echo \"\$files\" | tr '\n' '\0' | xargs -0 git add --
+        git commit --amend
+      }
+    )+reload($reload_cmd)"
+    --bind="ctrl-e:execute(
+      files=\$($xf {+f} | tr '\0' '\n')
+      \${EDITOR:-vim} \$(echo \"\$files\" | tr '\n' '\0' | xargs -0)
+    )+reload($reload_cmd)"
+    --bind="ctrl-o:execute(
+      files=\$($xf {+f} | tr '\0' '\n')
+      fzf-git-confirm \"Really add+commit: \$(echo \"\$files\" | sed 's/^/  /')?\" && {
+        echo \"\$files\" | tr '\n' '\0' | xargs -0 git add --
+        git commit
+      }
+    )+reload($reload_cmd)"
+    --bind="ctrl-p:execute(
+      files=\$($xf {+f} | tr '\0' '\n')
+      git add -p \$(echo \"\$files\" | tr '\n' '\0' | xargs -0)
+    )+reload($reload_cmd)"
     --preview="(git diff --color=always -- {-1} | sed 1,4d; cat {-1}) | head -$LINES"
   )
 
-  if [[ -n "$TMUX" ]]; then
-    fzf_opts+=(
-      --bind="ctrl-u:execute(
-        files=\$($xf {+f} | tr '\0' '\n')
-        fzf-git-confirm \"Really add+amend: \$(echo \"\$files\" | sed 's/^/  /')?\" && {
-          echo \"\$files\" | tr '\n' '\0' | xargs -0 git add --
-          tmux-popup 'git commit --amend'
-        }
-      )+reload($reload_cmd)"
-      --bind="ctrl-e:execute(
-        files=\$($xf {+f} | tr '\0' '\n')
-        tmux-popup \"\${EDITOR:-vim} \$(echo \"\$files\" | tr '\n' '\0' | xargs -0)\"
-      )+reload($reload_cmd)"
-      --bind="ctrl-o:execute(
-        files=\$($xf {+f} | tr '\0' '\n')
-        fzf-git-confirm \"Really add+commit: \$(echo \"\$files\" | sed 's/^/  /')?\" && {
-          echo \"\$files\" | tr '\n' '\0' | xargs -0 git add --
-          tmux-popup 'git commit'
-        }
-      )+reload($reload_cmd)"
-      --bind="ctrl-p:execute(
-        files=\$($xf {+f} | tr '\0' '\n')
-        tmux-popup \"git add -p \$(echo \"\$files\" | tr '\n' '\0' | xargs -0)\"
-      )+reload($reload_cmd)"
-    )
-  fi
-
   git -c color.status=always status --short |
-  fzf "${fzf_opts[@]}" |
+  fzf-git-base "📝 Files" "${fzf_opts[@]}" |
   cut -c4- | sed 's/.* -> //;s/^"//;s/"$//'
 }
 
@@ -207,7 +214,7 @@ gb() {
   reload_cmd="git branch -a --color=always | grep -v '/HEAD\s' | sort"
 
   git branch -a --color=always | grep -v '/HEAD\s' | sort |
-  fzf --ansi --multi --tac --border --border-label=" git branches " \
+  fzf-git-base "🌳 Branches" --multi --tac \
     --header="$header" \
     --prompt="$prompt" \
     --bind="ctrl-s:execute(_pager git log --color=always --stat \
@@ -289,8 +296,7 @@ gb() {
 gt() {
   is_in_git_repo || return
   git tag --sort -version:refname |
-  fzf-down --multi \
-    --border-label=" git tags " \
+  fzf-git-base "🔖 Tags" --multi \
     --preview="git show --color=always {} | head -$LINES"
 }
 
@@ -301,8 +307,7 @@ gh() {
   local prompt
   prompt="  👀: ^s:toggle-sort,?:help: "
 
-  fzf-down --ansi --no-sort --reverse --multi \
-    --border-label=" git hashes " \
+  fzf-git-base "🪪 Hashes" --no-sort --reverse --multi \
     --header 'Press CTRL-S to toggle sort' \
     --prompt="$prompt" \
     --bind='ctrl-s:toggle-sort' \
@@ -322,8 +327,7 @@ gr() {
   # shellcheck disable=SC2207
   out=($(
     git remote -v | awk '{print $1 "\t" $2}' | uniq |
-    fzf-down --tac \
-      --border-label=" git remotes " \
+    fzf-git-base "📡 Remotes" --tac \
       --header="$header" \
       --prompt="$prompt" \
       --expect="$expect" \
@@ -365,7 +369,7 @@ gr() {
 ga() {
   git config --get-regexp 'alias.*' |
     sed 's/^alias\.\([^ ]*\) \(.*\)/ \1#=> \2/' | column -s'#' -t | sort |
-  fzf-down --border-label=" git aliases " | awk '{ print $1; }'
+  fzf-git-base "😷 Aliases" | awk '{ print $1; }'
 }
 
 gl() {
@@ -379,8 +383,7 @@ gl() {
   # fshow - git commit browser (enter for show, ctrl-d for diff, ` toggles sort)
   git log --graph --color=always \
     --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
-  fzf --ansi --no-sort --reverse --tiebreak=index --toggle-sort=\` \
-      --border --border-label=" git log " \
+  fzf-git-base "📜 Logs" --no-sort --reverse --tiebreak=index --toggle-sort=\` \
       --prompt="$prompt" \
       --bind="ctrl-d:execute:echo {} | grep -Eo '[a-f0-9]+' | head -1 |
         xargs -I % bash -c 'git diff --color=always -p % |
@@ -415,7 +418,7 @@ gs() {
     elif [[ $yn == [sS]* ]]; then
       out=$(
         git -c color.status=always status --short |
-        fzf -m --ansi \
+        fzf-git-base "🦉 Choose Wisely"  -m \
           --header="Select files to stash (toggle with [tab] key)" \
           --preview="git diff --color=always -- {-1} | head -$LINES" |
         cut -c4- | sed 's/.* -> //'
@@ -428,7 +431,7 @@ gs() {
   if [[ -s "$(git rev-parse --git-dir)/refs/stash" ]]; then
     # shellcheck disable=SC2016
     git stash list --pretty='%C(yellow)%gd %>(14)%Cgreen%cr %C(blue)%gs' |
-    fzf --ansi --no-sort --border --border-label=" git stashes " --reverse \
+    fzf-git-base "📦 Stashes" --no-sort --reverse \
       --header="$header" \
       --prompt="$prompt" \
       --bind="enter:execute(_pager git stash show --color=always -p \$(cut -d' ' -f1 <<< {}))" \
@@ -456,7 +459,7 @@ gw() {
   reload_cmd="git worktree list"
 
   git worktree list |
-  fzf --border --border-label=" git worktrees " \
+  fzf-git-base "🌴 Worktrees" \
     --header="📝: ^x:remove" \
     --prompt="  👀: ?:help: " \
     --bind="ctrl-x:execute-silent(git worktree remove {1})+reload($reload_cmd)" \
@@ -471,8 +474,7 @@ grl() {
   git reflog --color=always \
     --format="%C(yellow)%gd %C(green)%cd %C(auto)%h%d %C(blue)%gs" \
     --date=short |
-  fzf --ansi --no-sort --reverse \
-    --border --border-label=" git reflog " \
+  fzf-git-base "🔬 Reflog" --no-sort --reverse \
     --prompt="  👀: ?:help: " \
     --preview="grep -o '[a-f0-9]\{7,\}' <<< {} | head -1 |
       xargs -I% git show --color=always --stat -p % | head -$LINES" |
