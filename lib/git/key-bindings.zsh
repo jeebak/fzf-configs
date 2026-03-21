@@ -62,7 +62,7 @@ bindkey '^g^v' __fzf-configs::grl-widget
 
 unset -f bind-git-helper bind-git-helper-no-join
 
-__fzf-configs::git-pull() {
+__fzf-configs::git-pull-widget() {
   if command -v gum > /dev/null; then
     gum spin --spinner dot --spinner.foreground=109 \
       --title "Git Pulling..." --title.foreground=240 \
@@ -70,9 +70,11 @@ __fzf-configs::git-pull() {
   else
     git pull
   fi
+  zle reset-prompt
 }
+zle -N __fzf-configs::git-pull-widget
 
-__fzf-configs::git-push() {
+__fzf-configs::git-push-widget() {
   if command -v gum > /dev/null; then
     gum spin --spinner dot --spinner.foreground=109 \
       --title "Git Pushing..." --title.foreground=240 \
@@ -80,7 +82,9 @@ __fzf-configs::git-push() {
   else
     git push
   fi
+  zle reset-prompt
 }
+zle -N __fzf-configs::git-push-widget
 
 # Avail.   '^g^q'
 # Worktrees'^g^w'
@@ -91,7 +95,7 @@ bindkey -s '^g^e' " ^ufzf-git edit-modified\n^y^h"
 #   "      '^g^u'
 #   "      '^g^i'
 #   "      '^g^o'
-bindkey -s '^g^p' " ^u__fzf-configs::git-pull\n^y^h"
+bindkey    '^g^p' __fzf-configs::git-pull-widget
 # Avail.   '^g^['
 #   "      '^g^]'
 # N/A      '^g^\'
@@ -119,6 +123,4 @@ bindkey -s '^g^g' " ^ugit status\n^y^h"
 # N/A      '^g^.'
 bindkey -s '^g^_' " ^ufzf-git\n^y^h"
 
-# NOTE: no "\n^y" like the others; both to allow to add extra params, and as a
-# safguard
-bindkey -s '^g\ep' " ^u__fzf-configs::git-push "
+bindkey    '^g\ep' __fzf-configs::git-push-widget

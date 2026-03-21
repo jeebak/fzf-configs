@@ -33,7 +33,7 @@ __fzf-configs::git-push() {
   fi
 }
 
-bind      '"\C-g\C-p": " \C-u__fzf-configs::git-pull\n\C-y\C-h"'
+bind -x   '"\C-g\C-p": __fzf-configs::git-pull'
 # Avail.  '"\C-g\C-["'
 #   "     '"\C-g\C-]"'
 # N/A     '"\C-g\C-\"'
@@ -64,6 +64,4 @@ bind      '"\C-g\C-b": "$(fzf-git gb)\e\C-e\er"'
 # N/A     '"\C-g\C-."'
 bind      '"\C-g\C-_": " \C-ufzf-git\n\C-y\C-h"'
 
-# NOTE:no "\n" like the others; both to allow to add extra params, and as a
-# safguard
-bind      '"\C-g\ep": " \C-u__fzf-configs::git-push "'
+bind -x   '"\C-g\ep": __fzf-configs::git-push'
