@@ -28,8 +28,8 @@ The codebase uses several intentional shellcheck disables:
 - `settings.sh` — sets `FZF_DEFAULT_OPTS`, `FZF_CTRL_T_OPTS`, `FZF_ALT_C_OPTS`, `FZF_TMUX_HEIGHT`; defines `_fzf_compgen_path`/`_fzf_compgen_dir` (fd-based if available); defines `_fzf-configs-completion` (zsh only) for per-command custom completions loaded from `~/.config/fzf-configs/completions/<cmd>.zsh`
 - `key-bindings.zsh` — defines `__fzf-configs::src` (ESC-s, ghq-based repo switcher), `__fzf-configs::edit-file` (CTRL-O / ESC-o)
 - `key-bindings.bash` — (currently empty, reserved)
-- `git/commands.sh` — defines all git functions: `gf` (files/status), `gb` (branches), `gt` (tags), `gh` (hashes/log), `gr` (remotes), `ga` (aliases), `gl` (log browser), `gs` (stashes), `gw` (worktrees), `grl` (reflog), `edit-modified`; also exports these functions to subshells via `eval "$(declare -F | sed -e 's/-f /-fx /')"`
-- `git/key-bindings.zsh` — binds `^G^F/B/T/R/H/L/A/W` via `bind-git-helper` (output inserted on command line) and `^G^S` via `bind-git-helper-no-join` (interactive browser, no output); `^G^V` (reflog) bound via a manually defined widget; also binds `^G^D` (git diff), `^G^G` (git status), `^G^P` (git pull), `^G^[P` (git push), `^G^E` (edit-modified), `^G^_` (fzf-git menu); `^GH`/`^GL` provide alternate bindings for tmux users who map `^{h,l}` to pane navigation; all persistent shell functions use the `__fzf-configs::` namespace prefix (e.g. `__fzf-configs::git-pull`, `__fzf-configs::gf-widget`)
+- `git/commands.sh` — sources `lib/utils.sh`; defines `fzf-git-base()` helper (adds `--ansi --border --border-label` and `--tmux` when `$TMUX` is set); defines all git functions: `gf` (files/status), `gb` (branches), `gt` (tags), `gh` (hashes/log), `gr` (remotes), `ga` (aliases), `gl` (log browser), `gs` (stashes), `gw` (worktrees), `grl` (reflog), `edit-modified`, `g?` (interactive `git help -a` browser); exports all functions to subshells via `eval "$(declare -F | sed -e 's/-f /-fx /')"`
+- `git/key-bindings.zsh` — binds `^G^F/B/T/R/H/L/A/W` via `bind-git-helper` (output inserted on command line) and `^G^S` via `bind-git-helper-no-join` (interactive browser, no output); `^G^V` (reflog) bound via a manually defined widget; also binds `^G^D` (git diff), `^G^G` (git status), `^G^P` (git pull), `^G^[P` (git push), `^G^E` (edit-modified), `^G^_` (fzf-git menu), `^G?` (git commands browser via `g?()`); `^GH`/`^GL` provide alternate bindings for tmux users who map `^{h,l}` to pane navigation; all persistent shell functions use the `__fzf-configs::` namespace prefix (e.g. `__fzf-configs::git-pull`, `__fzf-configs::gf-widget`)
 - `git/key-bindings.bash` — mirrors `key-bindings.zsh` using readline `bind` commands; output-producing functions use `"$(fzf-git gX)\e\C-e\er"`, interactive-only functions (gs, edit-modified, pull, git diff/status) use `" \C-ufzf-git gX\n\C-y\C-h"`
 
 **`libexec/` scripts** (internal helpers, not added to PATH):
@@ -40,9 +40,8 @@ The codebase uses several intentional shellcheck disables:
 - `preview` — file preview helper: uses `lsd`/`tree` for dirs, `bat`/`highlight`/`coderay`/`rougify`/`cat` for files; invoked via full path (`$PLUGIN_D/libexec/preview`) in `--preview` strings
 
 **`bin/` scripts** (added to PATH by `settings.sh`):
-- `fzf-git` — CLI dispatcher that sources `git/commands.sh` and calls subcommands by name (e.g., `fzf-git gf`, `fzf-git gb`)
+- `fzf-git` — CLI dispatcher that sources `git/commands.sh` and calls subcommands by name (e.g., `fzf-git gf`, `fzf-git gb`, `fzf-git g?`)
 - `fzlp` — fuzzy LastPass credential browser using `lpass` CLI + `pbcopy`
-- `git-commands` — interactive `git help -a` browser with fzf preview; native commands in white, custom in blue
 
 **Custom completions** (zsh only): drop a file at `~/.config/fzf-configs/completions/<cmd>.zsh`; it must use `$fzf` variable and set `$matches`. The `$query` variable holds the current token.
 
