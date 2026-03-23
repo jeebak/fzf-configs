@@ -138,8 +138,8 @@ These are set via `FZF_DEFAULT_OPTS` and apply to every fzf instance.
 |-------|------|
 | `FZF_DEFAULT_OPTS` | `alt-j`, `alt-k`, `ctrl-f`, `ctrl-b`, `alt-v`, `alt-w`, `alt-a`, `ctrl-z`, `?` |
 | `FZF_CTRL_T/ALT_C_OPTS` | `ctrl-c`, `ctrl-e`, `ctrl-v`, `alt-y`, `alt-p` |
-| `gf()` | `ctrl-a/d/h/l/n/r/s/t/w/x/y`, `alt-t`, tmux: `ctrl-e/o/p/u` |
-| `gb()` | `ctrl-d/f/n/p/r/s/w/o/x`, `alt-m/o` |
+| `gf()` | `ctrl-a/d/e/h/l/n/o/p/r/s/t/u/w/x/y`, `alt-t` |
+| `gb()` | `ctrl-d/e/f/n/o/p/r/s/w/x`, `alt-m/o` |
 | `gw()` | `ctrl-x` |
 | `grl()` | *(none — Enter outputs hash)* |
 | `gr()` | `ctrl-f/p/x`, `alt-p` |
@@ -168,10 +168,10 @@ Multi-select with `Tab`/`Shift-Tab` is enabled wherever it makes sense.
 | `CTRL-X` | `git rm -f` |
 | `CTRL-T` | `git commit -m "[WIP] <list of files>"` |
 | `CTRL-Y` | `git add` + `git commit --amend --no-edit` |
-| `CTRL-U` | `git add` + `git commit --amend` *(tmux only)* |
-| `CTRL-E` | `$EDITOR` *(tmux only)* |
-| `CTRL-O` | `git add` + `git commit` *(tmux only)* |
-| `CTRL-P` | `git add -p` *(tmux only)* |
+| `CTRL-U` | `git add` + `git commit --amend` |
+| `CTRL-E` | `$EDITOR` |
+| `CTRL-O` | `git add` + `git commit` |
+| `CTRL-P` | `git add -p` |
 
 ### `CTRL-G CTRL-B` — Branches
 
@@ -184,7 +184,8 @@ Multi-select with `Tab`/`Shift-Tab` is enabled wherever it makes sense.
 | `CTRL-P` | `git log -p` |
 | `CTRL-R` | `git branch -m <old> <new>` (renames branch under cursor) |
 | `CTRL-W` | `git checkout -b <new> <start>` (new branch from cursor) |
-| `CTRL-O` | `git checkout` (stashes first if dirty) |
+| `CTRL-O` | `git checkout` + close (stashes first if dirty) |
+| `CTRL-E` | `git checkout` + reload (stashes first if dirty) |
 | `CTRL-X` | `git branch -D` (also removes remote references) |
 | `ALT-M`  | `git merge` |
 | `ALT-O`  | Open branch in browser (converts remote URL to HTTPS) |
@@ -251,3 +252,4 @@ Offers to stash uncommitted changes when invoked.
 | `CTRL-G CTRL-V` | Reflog browser |
 | `CTRL-G CTRL-W` | Worktrees browser |
 | `CTRL-G ALT-P`  | `git push` |
+| `CTRL-G ?`      | Git commands browser |
