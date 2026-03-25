@@ -5,6 +5,8 @@
 
 mapfile -t lines < "$1"
 for line in "${lines[@]}"; do
+  # Strip ANSI escape codes (present when git uses color.status=always)
+  line=$(printf '%s' "$line" | sed $'s/\033\[[0-9;]*m//g')
   f="${line:3}"           # strip 2-char status code + space
   f="${f/* -> /}"         # strip rename arrow (keep new name)
   f="${f#\"}"             # strip leading quote (paths with spaces)

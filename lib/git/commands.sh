@@ -166,7 +166,7 @@ gf() {
     )+reload($reload_cmd)"
     --bind="ctrl-t:execute(
       files=\$($xf {+f} | tr '\0' '\n')
-      joined=\$(echo \"\$files\" | paste -sd, | sed 's/,/, /g')
+      joined=\${files//\$'\n'/, }
       fzf-git-confirm \"Really commit as [WIP] \$joined?\" &&
         { echo \"\$files\" | tr '\n' '\0' | xargs -0 git add -- && git commit -m \"[WIP] \$joined\" ; }
     )+reload($reload_cmd)"
