@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+# Git/SSH askpass helper: prompt for credentials via gum input.
+# Receives the prompt string as $1, outputs the credential to stdout.
+gum input --password --prompt "$1 "

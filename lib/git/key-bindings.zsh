@@ -64,6 +64,9 @@ unset -f bind-git-helper bind-git-helper-no-join
 
 __fzf-configs::git-pull-widget() {
   if command -v gum > /dev/null; then
+    local askpass="$PLUGIN_D/libexec/git-askpass"
+    SSH_ASKPASS="$askpass" SSH_ASKPASS_REQUIRE=prefer \
+    GIT_ASKPASS="$askpass" \
     gum spin --spinner dot --spinner.foreground=109 \
       --title "Git Pulling..." --title.foreground=240 \
       -- git pull
