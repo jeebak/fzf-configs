@@ -36,6 +36,7 @@ The codebase uses several intentional shellcheck disables:
 - `key-bindings-help` — prints the keybindings from `FZF_DEFAULT_OPTS`; invoked via full path (`$PLUGIN_D/libexec/key-bindings-help`) in `--bind` execute strings
 - `copy-abspath` — copies absolute path(s) of selected files to clipboard; bound to `alt-p` in `FZF_CTRL_T_OPTS`
 - `copy-file-contents` — copies file contents of selected file to clipboard; bound to `alt-y` in `FZF_CTRL_T_OPTS`
+- `git-askpass` — credential helper for `^G^P` git pull; set as `SSH_ASKPASS`/`GIT_ASKPASS` so credential prompts appear as a `gum input --password` dialog before the `gum spin` starts
 - `git-status-files` — extracts null-delimited filenames from a git status `{+f}` temp file; used by `gf()` execute bindings
 - `preview` — file preview helper: uses `lsd`/`tree` for dirs, `bat`/`highlight`/`coderay`/`rougify`/`cat` for files; invoked via full path (`$PLUGIN_D/libexec/preview`) in `--preview` strings
 
