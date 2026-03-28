@@ -12,3 +12,6 @@ source "$PLUGIN_D/lib/key-bindings.zsh"
 # fzf-git
 bindkey -r "^G"
 source "$PLUGIN_D/lib/git/key-bindings.zsh"
+
+# fzf-man
+source "$PLUGIN_D/lib/man/key-bindings.zsh"

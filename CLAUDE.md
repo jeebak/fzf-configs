@@ -20,8 +20,8 @@ The codebase uses several intentional shellcheck disables:
 ## Architecture
 
 **Entry points:**
-- `fzf-configs.plugin.zsh` — zsh loader: sources `ensure.sh`, `settings.sh`, `key-bindings.zsh`, then `lib/git/key-bindings.zsh`
-- `fzf-configs.plugin.bash` — bash loader: sources `ensure.sh`, `settings.sh`, `key-bindings.bash`, then `lib/git/key-bindings.bash`
+- `fzf-configs.plugin.zsh` — zsh loader: sources `ensure.sh`, `settings.sh`, `key-bindings.zsh`, `lib/git/key-bindings.zsh`, `lib/man/key-bindings.zsh`
+- `fzf-configs.plugin.bash` — bash loader: sources `ensure.sh`, `settings.sh`, `key-bindings.bash`, `lib/git/key-bindings.bash`, `lib/man/key-bindings.bash`
 
 **`lib/` files:**
 - `ensure.sh` — installs fzf (via brew or git clone) and gum (via brew; falls back to whiptail if already present) if missing; runs `hash` to refresh PATH cache
@@ -43,6 +43,7 @@ The codebase uses several intentional shellcheck disables:
 
 **`bin/` scripts** (added to PATH by `settings.sh`):
 - `fzf-git` — CLI dispatcher that sources `git/commands.sh` and calls subcommands by name (e.g., `fzf-git gf`, `fzf-git gb`, `fzf-git g?`)
+- `fzf-man` — CLI dispatcher that sources `man/commands.sh` and defaults to `man_fzf` when called with no arguments; bound to `ESC-M`
 - `fzlp` — fuzzy LastPass credential browser using `lpass` CLI + `pbcopy`
 
 **Custom completions** (zsh only): drop a file at `~/.config/fzf-configs/completions/<cmd>.zsh`; it must use `$fzf` variable and set `$matches`. The `$query` variable holds the current token.

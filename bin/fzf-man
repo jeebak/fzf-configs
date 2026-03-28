@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+PLUGIN_D="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd -P)"
+# -----------------------------------------------------------------------------
+# shellcheck disable=SC1090
+source "$PLUGIN_D/lib/man/commands.sh"
+# -----------------------------------------------------------------------------
+if [[ "${BASH_SOURCE[0]}" = "${0}" ]]; then
+  subcommand="${1:-man_fzf}"
+  shift 2>/dev/null
+
+  case $subcommand in
+    "-h" | "--help")
+      echo "Usage: fzf-man [subcommand]"
+      ;;
+    *)
+      "${subcommand}" "$@"
+      if [[ $? -eq 127 ]]; then
+        cat <<EOT >&2
+Error: '$subcommand' is not a known subcommand.
+EOT
+        exit $?
+      fi
+      ;;
+  esac
+fi
+# vim: set ft=bash:

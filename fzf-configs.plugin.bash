@@ -11,3 +11,6 @@ source "$PLUGIN_D/lib/key-bindings.bash"
 # fzf-git
 bind -r "\C-g"
 source "$PLUGIN_D/lib/git/key-bindings.bash"
+
+# fzf-man
+source "$PLUGIN_D/lib/man/key-bindings.bash"
