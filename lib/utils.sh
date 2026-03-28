@@ -1,5 +1,23 @@
 #!/usr/bin/env bash
 
+# Base fzf wrapper: adds --ansi --border --border-label and --tmux when inside tmux.
+# Inspired by junegunn/fzf-git.sh. Usage: fzf-base "Label" [fzf-opts...]
+fzf-base() {
+  local label="$1"; shift
+  local -a tmux_opt=()
+  if [[ -n "$TMUX" ]]; then
+    local w h max_w max_h
+    max_w=180
+    max_h=60
+    w=$(( $(tmux display-message -p '#{client_width}') * 9 / 10 ))
+    h=$(( $(tmux display-message -p '#{client_height}') * 9 / 10 ))
+    (( w > max_w )) && w=$max_w
+    (( h > max_h )) && h=$max_h
+    tmux_opt=(--tmux "$w,$h")
+  fi
+  fzf --ansi --border --border-label=" $label " "${tmux_opt[@]}" "$@"
+}
+
 # Quiet everything
 qt() {
   "$@" > /dev/null 2>&1
