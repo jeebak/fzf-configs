@@ -4,14 +4,50 @@ if [[ -d "$1" ]]; then
   ( lsd --color=always --tree -a "$1" ||
     tree -Ca "$1"
   ) 2> /dev/null | head -"$2"
-elif [[ $(file --mime "$1") =~ binary ]]; then
-  echo Binary: "$1"
 else
-  ( bat --style=changes,grid,numbers --color=always "$1" ||
-    batcat --style=changes,grid,numbers --color=always "$1" ||
-    highlight -O ansi -l "$1" ||
-    coderay "$1" ||
-    rougify "$1" ||
-    cat "$1"
-  ) 2> /dev/null | head -"$2"
+  mime=$(file --mime-type -b "$1")
+  if [[ $mime =~ ^video/ ]]; then
+    ffprobe "$1" 2>&1
+  elif [[ $mime =~ ^image/ ]]; then
+    ( chafa "$1" ||
+      file "$1"
+    ) 2>/dev/null
+  elif [[ $mime =~ ^audio/ ]]; then
+    ffprobe "$1" 2>&1
+  elif [[ $mime = application/pdf ]]; then
+    ( pdftotext "$1" - ||
+      mutool draw -F txt "$1"
+    ) 2>/dev/null | head -"$2"
+  elif [[ $mime =~ ^application/(zip|x-zip-compressed) ]]; then
+    unzip -l "$1"
+  elif [[ $mime =~ ^application/(x-tar|gzip|x-bzip2|x-xz|zstd|x-zstd) ]]; then
+    tar -tvf "$1"
+  elif [[ $mime = application/x-7z-compressed ]]; then
+    7z l "$1"
+  elif [[ $mime =~ ^application/x-rar ]]; then
+    unrar l "$1"
+  elif [[ $mime = application/x-sqlite3 ]]; then
+    sqlite3 "$1" .tables
+  elif [[ $mime = application/json ]]; then
+    ( jq . "$1" ||
+      cat "$1"
+    ) 2>/dev/null | head -"$2"
+  elif [[ $mime = application/x-iso9660-image ]]; then
+    isoinfo -d -i "$1"
+  elif [[ $mime =~ ^application/vnd\.openxmlformats ]]; then
+    ( unzip -p "$1" "word/document.xml" ||
+      unzip -p "$1" "xl/sharedStrings.xml" ||
+      unzip -p "$1" "ppt/slides/slide1.xml"
+    ) 2>/dev/null | xmllint --format - 2>/dev/null | head -"$2"
+  elif [[ $mime =~ binary|octet-stream ]]; then
+    echo "Binary: $1"
+  else
+    ( bat --style=changes,grid,numbers --color=always "$1" ||
+      batcat --style=changes,grid,numbers --color=always "$1" ||
+      highlight -O ansi -l "$1" ||
+      coderay "$1" ||
+      rougify "$1" ||
+      cat "$1"
+    ) 2> /dev/null | head -"$2"
+  fi
 fi
