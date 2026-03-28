@@ -69,10 +69,16 @@ __fzf-configs::git-pull-widget() {
     GIT_ASKPASS="$askpass" \
     gum spin --spinner dot --spinner.foreground=109 \
       --title "Git Pulling..." --title.foreground=240 \
+      --show-stdout --show-stderr \
       -- git pull
   else
     git pull
   fi
+  # Run precmd hooks so git-aware prompts (vcs_info, p10k, starship, etc.) refresh
+  local f
+  for f in "${precmd_functions[@]}"; do
+    (( ${+functions[$f]} )) && "$f"
+  done
   zle reset-prompt
 }
 zle -N __fzf-configs::git-pull-widget
@@ -81,10 +87,16 @@ __fzf-configs::git-push-widget() {
   if command -v gum > /dev/null; then
     gum spin --spinner dot --spinner.foreground=109 \
       --title "Git Pushing..." --title.foreground=240 \
+      --show-stdout --show-stderr \
       -- git push
   else
     git push
   fi
+  # Run precmd hooks so git-aware prompts (vcs_info, p10k, starship, etc.) refresh
+  local f
+  for f in "${precmd_functions[@]}"; do
+    (( ${+functions[$f]} )) && "$f"
+  done
   zle reset-prompt
 }
 zle -N __fzf-configs::git-push-widget

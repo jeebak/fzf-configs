@@ -20,7 +20,9 @@ __fzf-configs::git-pull() {
     GIT_ASKPASS="$askpass" \
     gum spin --spinner dot --spinner.foreground=109 \
       --title "Git Pulling..." --title.foreground=240 \
+      --show-stdout --show-stderr \
       -- git pull
+    echo
   else
     git pull
   fi
@@ -30,7 +32,9 @@ __fzf-configs::git-push() {
   if command -v gum > /dev/null; then
     gum spin --spinner dot --spinner.foreground=109 \
       --title "Git Pushing..." --title.foreground=240 \
+      --show-stdout --show-stderr \
       -- git push
+    echo
   else
     git push
   fi
