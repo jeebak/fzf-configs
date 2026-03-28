@@ -11,6 +11,14 @@ A shell plugin that configures [fzf](https://github.com/junegunn/fzf) with git-a
 - [`lsd`](https://github.com/lsd-rs/lsd) — directory tree previews (falls back to `tree`)
 - [`fd`](https://github.com/sharkdp/fd) — faster path/directory completion
 - [`ghq`](https://github.com/x-motemen/ghq) — repo switcher (`ESC-s`, zsh only)
+- [`chafa`](https://hpjansson.org/chafa/) — image previews in the terminal
+- [`ffprobe`](https://ffmpeg.org/) — video/audio metadata previews (part of ffmpeg)
+- [`jq`](https://jqlang.github.io/jq/) — JSON previews
+- `pdftotext` / [`mutool`](https://mupdf.com/) — PDF text previews
+- `sqlite3` — SQLite database previews (`.tables`)
+- `isoinfo` — ISO disc image previews
+- `7z`, `unrar` — archive previews for 7-zip and RAR formats
+- `xmllint` — Office file (docx/xlsx/pptx) previews
 
 **Required by bin scripts:**
 - `fzlp` — [`lpass`](https://github.com/lastpass/lastpass-cli)

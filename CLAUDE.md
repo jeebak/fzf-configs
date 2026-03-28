@@ -38,7 +38,7 @@ The codebase uses several intentional shellcheck disables:
 - `copy-file-contents` — copies file contents of selected file to clipboard; bound to `alt-y` in `FZF_CTRL_T_OPTS`
 - `git-askpass` — credential helper for `^G^P` git pull; set as `SSH_ASKPASS`/`GIT_ASKPASS` so credential prompts appear as a `gum input --password` dialog before the `gum spin` starts
 - `git-status-files` — extracts null-delimited filenames from a git status `{+f}` temp file; used by `gf()` execute bindings
-- `preview` — file preview helper: uses `lsd`/`tree` for dirs, `bat`/`highlight`/`coderay`/`rougify`/`cat` for files; invoked via full path (`$PLUGIN_D/libexec/preview`) in `--preview` strings
+- `preview` — file preview helper: dispatches by mime type (via `file --mime-type -b`); dirs use `lsd`/`tree`; video/audio use `ffprobe`; images use `chafa`; pdf uses `pdftotext`/`mutool`; archives (zip/tar/7z/rar) list contents; sqlite3 shows `.tables`; json uses `jq`; iso uses `isoinfo`; Office (docx/xlsx/pptx) extracts XML via `xmllint`; other text falls back to `bat`/`highlight`/`coderay`/`rougify`/`cat`; invoked via full path (`$PLUGIN_D/libexec/preview`) in `--preview` strings
 
 **`bin/` scripts** (added to PATH by `settings.sh`):
 - `fzf-git` — CLI dispatcher that sources `git/commands.sh` and calls subcommands by name (e.g., `fzf-git gf`, `fzf-git gb`, `fzf-git g?`)
