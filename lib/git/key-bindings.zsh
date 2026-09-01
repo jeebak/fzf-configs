@@ -62,6 +62,19 @@ bindkey '^g^v' __fzf-configs::grl-widget
 
 unset -f bind-git-helper bind-git-helper-no-join
 
+# gum's TUI library probes the terminal on startup -- DECRQM mode 2027,
+# grapheme clustering -- and can hand the tty back before the reply arrives.
+# Inside a ZLE widget that unread reply becomes keystrokes: a leading <esc>
+# (bound to vi-cmd-mode in some configs) plus a literal "[?2027;0$y" in the
+# buffer. Typeahead entered while git ran is discarded along with it, which
+# beats feeding escape sequences to the next command.
+__fzf-configs::drain-tty() {
+  local REPLY
+  while read -r -t 0 -k 1 2>/dev/null; do
+    :
+  done
+}
+
 __fzf-configs::git-pull-widget() {
   if command -v gum > /dev/null; then
     local askpass="$PLUGIN_D/libexec/git-askpass"
@@ -71,6 +84,7 @@ __fzf-configs::git-pull-widget() {
       --title "Git Pulling..." --title.foreground=240 \
       --show-stdout --show-stderr \
       -- git pull
+    __fzf-configs::drain-tty
   else
     git pull
   fi
@@ -89,6 +103,7 @@ __fzf-configs::git-push-widget() {
       --title "Git Pushing..." --title.foreground=240 \
       --show-stdout --show-stderr \
       -- git push
+    __fzf-configs::drain-tty
   else
     git push
   fi
